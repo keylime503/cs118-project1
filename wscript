@@ -9,8 +9,8 @@ def configure (env):
     env.load ('boost')
 
 # comment out the following two lines if compiling not on lnxsrv
-    env.options.boost_includes = '/u/cs/grad/afanasye/boost/include'
-    env.options.boost_libs     = '/u/cs/grad/afanasye/boost/lib'
+    env.options.boost_includes = '/u/cs/grad/yingdi/boost/include'
+    env.options.boost_libs     = '/u/cs/grad/yingdi/boost/lib'
 #
 
     env.check_boost(lib='thread')
@@ -29,21 +29,6 @@ def build (env):
             # ...
             #
             "http-proxy.cc", # main() function is here
-            "http-headers.cc",
-            "http-request.cc",
-            "http-response.cc",
-            ]
-        )
-
-    client = env.program (
-        target = "http-get",
-        features = ["cxx", "cxxprogram"],
-        use = 'BOOST BOOST_THREAD',
-        source = [
-            # Put additional files here
-            # ...
-            #
-            "http-get.cc", # main() function is here
             "http-headers.cc",
             "http-request.cc",
             "http-response.cc",
