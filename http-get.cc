@@ -6,7 +6,13 @@ using namespace std;
 
 int main (int argc, char *argv[])
 {
-  // command line parsing
+	// command line parsing
+	if(argc > 1)
+	{
+		cout << "Too many arguments" << endl;
+		return 1;
+	}
+	cout << "Hi. Im the client" << endl;
   
-  return 0;
+	return 0;
 }
