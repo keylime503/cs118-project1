@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <string>
+#include <unistd.h>
 #include <stdlib.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -51,7 +52,7 @@ int main (int argc, char *argv[])
 	if(listen(sockfd, 10) < 0)
 		error("Error listening to socket");
   	
-  	int cliLength = sizeof(cliAddr);
+  	unsigned int cliLength = sizeof(cliAddr);
   	newsockfd = accept(sockfd, (sockaddr *) &cliAddr, &cliLength);
   	if(newsockfd < 0)
   		error("Error on accept");
