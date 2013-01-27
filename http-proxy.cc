@@ -13,6 +13,16 @@
 #include "http-response.h"
 using namespace std;
 
+#DEFINE DEBUG_HTTP_PROXY 1
+
+void debug(string msg)
+{
+	if(DEBUG_HTTP_PROXY)
+	{
+		cout << msg << endl;
+	}
+}
+
 void error(string msg)
 {
 	cout << msg;
@@ -33,7 +43,9 @@ int main (int argc, char *argv[])
   	uint16_t portnum = 14805;
 	sockaddr_in servAddr, cliAddr;
 
+
 	//Create Socket
+	debug("Creating Socket");
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if(sockfd < 0)
 		error("Error opening socket");
@@ -45,14 +57,19 @@ int main (int argc, char *argv[])
 	servAddr.sin_port =  htons(portnum);
 	servAddr.sin_addr.s_addr = INADDR_ANY;
 
+	debug("Binding Socket");
 	//Bind Socket
 	if(bind(sockfd, (sockaddr *) &servAddr, sizeof(servAddr)) < 0)
 		error("Error binding socket");
 
+	debug("Listening to Socket");
 	if(listen(sockfd, 10) < 0)
 		error("Error listening to socket");
   	
+
   	unsigned int cliLength = sizeof(cliAddr);
+  	
+  	debug("Accepting Socket");
   	newsockfd = accept(sockfd, (sockaddr *) &cliAddr, &cliLength);
   	if(newsockfd < 0)
   		error("Error on accept");
