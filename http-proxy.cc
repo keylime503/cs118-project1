@@ -15,7 +15,7 @@ using namespace std;
 
 void error(string msg)
 {
-	cerr << msg;
+	cout << msg;
 	exit(1);
 }
 
