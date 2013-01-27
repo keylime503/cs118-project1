@@ -30,7 +30,7 @@ int main (int argc, char *argv[])
   	char buffer[1024];
   	int sockfd, newsockfd;
   	uint16_t portnum = 14805;
-	sockaddr servAddr, cliAddr;
+	sockaddr_in servAddr, cliAddr;
 
 	//Create Socket
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -45,13 +45,13 @@ int main (int argc, char *argv[])
 	servAddr.sin_addr.s_addr = INADDR_ANY;
 
 	//Bind Socket
-	if(bind(sockfd, &servAddr, sizeof(servAddr)) < 0)
+	if(bind(sockfd, (sockaddr *) &servAddr, sizeof(servAddr)) < 0)
 		error("Error binding socket");
 
 	if(listen(sockfd, 10) < 0)
 		error("Error listening to socket");
   	
-  	newsockfd = accept(sockfd, &cliAddr, sizeof(cliAddr));
+  	newsockfd = accept(sockfd, (sockaddr *) &cliAddr, sizeof(cliAddr));
   	if(newsockfd < 0)
   		error("Error on accept");
 
