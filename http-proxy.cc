@@ -13,7 +13,7 @@
 #include "http-response.h"
 using namespace std;
 
-#DEFINE DEBUG_HTTP_PROXY 1
+#define DEBUG_HTTP_PROXY 1
 
 void debug(string msg)
 {
