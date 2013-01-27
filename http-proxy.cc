@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 
 #include <iostream>
+#include <stdlib.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 
@@ -28,7 +29,7 @@ int main (int argc, char *argv[])
   	char buffer[1024];
   	int sockfd;
   	uint16_t portnum = 14805;
-	struct sockaddr_in servAddr, cliAddr;
+	struct sockaddr servAddr, cliAddr;
 
 	//Create Socket
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -37,7 +38,7 @@ int main (int argc, char *argv[])
 
 	//Create servAddr struct
 	//Zero out struct
-	bzero((char *) &servAddr, sizeof(servAddr));
+	//bzero((char *) &servAddr, sizeof(servAddr));
 	servAddr.sa_family = AF_INET;
 	servAddr.sin_port =  htons(portnum);
 	servAddr.sin_addr.s_addr = INADDR_ANY;
