@@ -40,7 +40,7 @@ int main (int argc, char *argv[])
 	//Create servAddr struct
 	//Zero out struct
 	//bzero((char *) &servAddr, sizeof(servAddr));
-	servAddr.sa_family = AF_INET;
+	servAddr.sin_family = AF_INET;
 	servAddr.sin_port =  htons(portnum);
 	servAddr.sin_addr.s_addr = INADDR_ANY;
 
@@ -51,7 +51,8 @@ int main (int argc, char *argv[])
 	if(listen(sockfd, 10) < 0)
 		error("Error listening to socket");
   	
-  	newsockfd = accept(sockfd, (sockaddr *) &cliAddr, sizeof(cliAddr));
+  	int cliLength = sizeof(cliAddr);
+  	newsockfd = accept(sockfd, (sockaddr *) &cliAddr, &cliLength);
   	if(newsockfd < 0)
   		error("Error on accept");
 
