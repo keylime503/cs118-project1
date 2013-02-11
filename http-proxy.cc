@@ -29,7 +29,7 @@ void error(string msg)
 	exit(1);
 }
 
-void process(sockfd)
+void process(int sockfd)
 {
 	//Read from socket
 	int bufferSize = 1024;
