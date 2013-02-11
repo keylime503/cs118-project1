@@ -4,6 +4,7 @@
 #include <string>
 #include <unistd.h>
 #include <stdlib.h>
+#include <cstring>
 #include <sys/socket.h>
 #include <netinet/in.h>
 
@@ -38,7 +39,7 @@ void process(int sockfd)
 	int tempSize = 1024;
 	char* temp = new char[tempSize];
 	char* buffer = new char[bufferSize];
-	while((bytesRead = read(newsockfd, temp, tempSize)) > 0)
+	while((bytesRead = read(sockfd, temp, tempSize)) > 0)
 	{
 		//Check if buffer is big enough
 		if(bufferSize < dataSize + bytesRead)
