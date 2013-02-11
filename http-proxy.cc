@@ -118,5 +118,27 @@ int main (int argc, char *argv[])
 			close(newsockfd);
 		}
 	}
+
+	// Create HTTP Request object
+	HttpRequest req;
+	try
+	{
+		ParseRequest(buffer, dataSize);
+	}
+	catch
+	{
+		debug("An exception occurred.");
+	}
+	
+	string host = req.getHost();
+	short port = req.getPort();
+	string path = req.getPath();
+	
+	// Create buffer for HTTPRequest object
+	size_t bufLength = req.GetTotalLength();
+	char * buffer = new char[bufLength];
+	req.FormatRequest(buffer);
+	
+
 	return 0;
 }
