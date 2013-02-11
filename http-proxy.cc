@@ -29,6 +29,33 @@ void error(string msg)
 	exit(1);
 }
 
+void process(sockfd)
+{
+	//Read from socket
+	int bufferSize = 1024;
+	int dataSize = 0;
+	int bytesRead = 0;
+	int tempSize = 1024;
+	char* temp = new char[tempSize];
+	char* buffer = new char[bufferSize];
+	while((bytesRead = read(newsockfd, temp, tempSize)) > 0)
+	{
+		//Check if buffer is big enough
+		if(bufferSize < dataSize + bytesRead)
+		{
+			char* bigBuffer = new char[bufferSize * 2];
+			memcpy(buffer, bigBuffer, dataSize);
+			bufferSize *= 2;
+			free(buffer);
+			buffer = bigBuffer;
+		}
+		//Add to buffer
+		memcpy(buffer + dataSize, temp, bytesRead);
+		dataSize += bytesRead;
+	}
+	cout << "Message: " << buffer << endl;
+}
+
 int main (int argc, char *argv[])
 {
  	// command line parsing
@@ -68,27 +95,27 @@ int main (int argc, char *argv[])
 
 	unsigned int cliLength = sizeof(cliAddr);
 
-	int fd;
-	while (fd > 0)
+	while (1)
 	{
 		debug("Accepting Socket");
 		newsockfd = accept(sockfd, (sockaddr *) &cliAddr, &cliLength);
 		if(newsockfd < 0)
 			error("Error on accept");
-	} //Child Process will fall through here
-  	
-  	//Read from socket 
-	char* buffer, iter;
-	int bufferSize = 1024;
-	buffer = new char[bufferSize];
-	while(bufferSize == read(newsockfd, buffer, bufferSize))
-	{
-  		//More to read from Socket
-		char * temp = new char[bufferSize * 2];
-		memcpy(buffer, temp, bufferSize);
-
+		int pid = fork();
+		if(pid < 0)
+		{
+			error("Error on Fork");
+		}
+		else if (pid == 0) //Child
+		{
+			close(sockfd);
+			process(newsockfd);
+			exit(0);
+		}
+		else //Parent
+		{
+			close(newsockfd);
+		}
 	}
-
-	cout << "Message: " << buffer << endl;
 	return 0;
 }
