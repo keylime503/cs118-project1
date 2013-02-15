@@ -83,8 +83,8 @@ void process(int clientSockfd)
 	free(buffer);
 
 	//HTTP Request good, send to server
-	string host = req.getHost();
-	short port = req.getPort();
+	string host = req.GetHost();
+	short port = req.GetPort();
 	
 	// Create buffer for HTTPRequest object
 	size_t bufLength = req.GetTotalLength();
