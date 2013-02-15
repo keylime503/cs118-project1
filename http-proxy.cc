@@ -43,15 +43,15 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 	int bytesRead = 0;
 	int tempSize = 1024;
 	char* temp = new char[tempSize];
-	char* buffer = new char[bufferSize];
-	while((bytesRead = read(clientSockfd, temp, tempSize)) > 0)
+	char* buffer = new char[buffSize];
+	while((bytesRead = read(sockfd, temp, tempSize)) > 0)
 	{
 		//Check if buffer is big enough
-		if(bufferSize < dataSize + bytesRead)
+		if(buffSize < dataSize + bytesRead)
 		{
-			char* bigBuffer = new char[bufferSize * 2];
+			char* bigBuffer = new char[buffSize * 2];
 			memcpy(buffer, bigBuffer, dataSize);
-			bufferSize *= 2;
+			buffSize *= 2;
 			free(buffer);
 			buffer = bigBuffer;
 		}
@@ -66,8 +66,8 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 void process(int clientSockfd)
 {
 	//Read from socket
-	int bufferSize, dataSize;
-	char * buffer = readResponse(clientSockfd, buffSize, dataSize)
+	int buffSize, dataSize;
+	char * buffer = readResponse(clientSockfd, buffSize, dataSize);
 
 	// Create HTTP Request object
 	HttpRequest req;
@@ -85,7 +85,6 @@ void process(int clientSockfd)
 	//HTTP Request good, send to server
 	string host = req.getHost();
 	short port = req.getPort();
-	string path = req.getPath();
 	
 	// Create buffer for HTTPRequest object
 	size_t bufLength = req.GetTotalLength();
@@ -111,7 +110,7 @@ void process(int clientSockfd)
       server->h_length);
 	serv_addr.sin_port = htons(port);
 
-	if (connect(sockfd,&serv_addr,sizeof(serv_addr)) < 0)
+	if (connect(servSockfd,&serv_addr,sizeof(serv_addr)) < 0)
   		error("ERROR connecting");
 
   	int bytesWritten = write(servSockfd, buffer, bufLength);
@@ -121,7 +120,7 @@ void process(int clientSockfd)
   	}
 	free(buffer);
 	//Listen For response from server
-	buffer = readResponse(servSockfd, bufferSize, dataSize);
+	buffer = readResponse(servSockfd, buffSize, dataSize);
 
 	//Send back to client
 	bytesWritten = write(clientSockfd, buffer, dataSize);
