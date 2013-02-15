@@ -7,6 +7,7 @@
 #include <cstring>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <netdb.h>
 
 
 #include "http-headers.h"
@@ -30,16 +31,20 @@ void error(string msg)
 	exit(1);
 }
 
-void process(int sockfd)
+//Reads all of the data on a socket, and puts it in a char buffer.
+//Returns pointer to char buffer, sets buffSize to the allocated size
+//and dataSize to the amount of data. Caller must free the buffer.
+char * readResponse(int sockfd, int& buffSize, int& dataSize)
 {
-	//Read from socket
-	int bufferSize = 1024;
-	int dataSize = 0;
+	//TODO: Check for overflow problems
+
+	buffSize = 1024;
+	dataSize = 0;
 	int bytesRead = 0;
 	int tempSize = 1024;
 	char* temp = new char[tempSize];
 	char* buffer = new char[bufferSize];
-	while((bytesRead = read(sockfd, temp, tempSize)) > 0)
+	while((bytesRead = read(clientSockfd, temp, tempSize)) > 0)
 	{
 		//Check if buffer is big enough
 		if(bufferSize < dataSize + bytesRead)
@@ -54,7 +59,76 @@ void process(int sockfd)
 		memcpy(buffer + dataSize, temp, bytesRead);
 		dataSize += bytesRead;
 	}
-	cout << "Message: " << buffer << endl;
+	free(temp);
+	return buffer;
+}
+
+void process(int clientSockfd)
+{
+	//Read from socket
+	int bufferSize, dataSize;
+	char * buffer = readResponse(clientSockfd, buffSize, dataSize)
+
+	// Create HTTP Request object
+	HttpRequest req;
+	try
+	{
+		req.ParseRequest(buffer, dataSize);
+	}
+	catch(ParseException e)
+	{
+		debug(e.what());
+	}
+	
+	free(buffer);
+
+	//HTTP Request good, send to server
+	string host = req.getHost();
+	short port = req.getPort();
+	string path = req.getPath();
+	
+	// Create buffer for HTTPRequest object
+	size_t bufLength = req.GetTotalLength();
+	buffer = new char[bufLength];
+	req.FormatRequest(buffer);
+
+	//Send Request to server
+	int servSockfd = socket(AF_INET, SOCK_STREAM, 0);
+	if(servSockfd < 0)
+		error("Error opening socket to server");
+
+
+	hostent *server = gethostbyname(host.c_str());
+	if(server == NULL)
+	{
+		error("No Such server");
+	}
+
+	sockaddr_in serv_addr;
+	bzero((char *) &serv_addr, sizeof(serv_addr));
+	bcopy((char *)server->h_addr,
+      (char *)&serv_addr.sin_addr.s_addr,
+      server->h_length);
+	serv_addr.sin_port = htons(port);
+
+	if (connect(sockfd,&serv_addr,sizeof(serv_addr)) < 0)
+  		error("ERROR connecting");
+
+  	int bytesWritten = write(servSockfd, buffer, bufLength);
+  	if(bytesWritten < 0)
+  	{
+  		error("Error writing to servSockfd");
+  	}
+	free(buffer);
+	//Listen For response from server
+	buffer = readResponse(servSockfd, bufferSize, dataSize);
+
+	//Send back to client
+	bytesWritten = write(clientSockfd, buffer, dataSize);
+	if(bytesWritten < 0)
+		error("Error writing to clientSockfd");
+
+	//cout << "Message: " << buffer << endl;
 }
 
 int main (int argc, char *argv[])
@@ -118,27 +192,6 @@ int main (int argc, char *argv[])
 			close(newsockfd);
 		}
 	}
-
-	// Create HTTP Request object
-	HttpRequest req;
-	try
-	{
-		ParseRequest(buffer, dataSize);
-	}
-	catch
-	{
-		debug("An exception occurred.");
-	}
-	
-	string host = req.getHost();
-	short port = req.getPort();
-	string path = req.getPath();
-	
-	// Create buffer for HTTPRequest object
-	size_t bufLength = req.GetTotalLength();
-	char * buffer = new char[bufLength];
-	req.FormatRequest(buffer);
-	
 
 	return 0;
 }
