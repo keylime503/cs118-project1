@@ -110,7 +110,7 @@ void process(int clientSockfd)
       server->h_length);
 	serv_addr.sin_port = htons(port);
 
-	if (connect(servSockfd,&serv_addr,sizeof(serv_addr)) < 0)
+	if (connect(servSockfd,(sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
   		error("ERROR connecting");
 
   	int bytesWritten = write(servSockfd, buffer, bufLength);
