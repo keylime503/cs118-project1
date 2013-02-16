@@ -36,16 +36,24 @@ void error(string msg)
 //and dataSize to the amount of data. Caller must free the buffer.
 char * readResponse(int sockfd, int& buffSize, int& dataSize)
 {
+	debug("In readResponse()");
+
 	//TODO: Check for overflow problems
 
-	buffSize = 1024;
 	dataSize = 0;
 	int bytesRead = 0;
 	int tempSize = 1024;
 	char* temp = new char[tempSize];
 	char* buffer = new char[buffSize];
-	while((bytesRead = read(sockfd, temp, tempSize)) > 0)
-	{
+	
+	//while(1)
+	//{
+		debug("Before");
+		bytesRead = read(sockfd, temp, tempSize);
+		debug("After");
+		cout << "Bytes Read: " << bytesRead << endl;
+		cout << "Buffer: " << temp << endl;
+
 		//Check if buffer is big enough
 		if(buffSize < dataSize + bytesRead)
 		{
@@ -58,7 +66,9 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 		//Add to buffer
 		memcpy(buffer + dataSize, temp, bytesRead);
 		dataSize += bytesRead;
-	}
+		debug("End of bytesRead loop");
+	//}
+	debug("End of readResponse()");
 	free(temp);
 	return buffer;
 }
@@ -70,6 +80,8 @@ void process(int clientSockfd)
 	//Read from socket
 	int buffSize, dataSize;
 	char * buffer = readResponse(clientSockfd, buffSize, dataSize);
+
+	debug("After readResponse()");
 
 	// Create HTTP Request object
 	HttpRequest req;
@@ -84,11 +96,14 @@ void process(int clientSockfd)
 	
 	debug("After try-catch");
 
-	free(buffer);
+
+	debug("After first free");
 
 	//HTTP Request good, send to server
 	string host = req.GetHost();
 	short port = req.GetPort();
+	
+	free(buffer);
 	
 	// Create buffer for HTTPRequest object
 	size_t bufLength = req.GetTotalLength();
@@ -96,6 +111,7 @@ void process(int clientSockfd)
 	req.FormatRequest(buffer);
 
 	//Send Request to server
+	debug("Sending request to server");
 	int servSockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if(servSockfd < 0)
 		error("Error opening socket to server");
@@ -123,14 +139,18 @@ void process(int clientSockfd)
   		error("Error writing to servSockfd");
   	}
 	free(buffer);
-	//Listen For response from server
+
+	// Listening to response from server
+	debug("Listening for response from server");
 	buffer = readResponse(servSockfd, buffSize, dataSize);
 
 	//Send back to client
+	debug("Sending response to client");
 	bytesWritten = write(clientSockfd, buffer, dataSize);
 	if(bytesWritten < 0)
 		error("Error writing to clientSockfd");
 
+	debug("End of process()");
 	//cout << "Message: " << buffer << endl;
 }
 
