@@ -154,7 +154,7 @@ int main (int argc, char *argv[])
 	//Zero out struct
 	//bzero((char *) &servAddr, sizeof(servAddr));
 	servAddr.sin_family = AF_INET;
-	servAddr.sin_port =  htons(portnum);
+	servAddr.sin_port = htons(portnum);
 	servAddr.sin_addr.s_addr = INADDR_ANY;
 
 	//Bind Socket
@@ -175,6 +175,7 @@ int main (int argc, char *argv[])
 		newsockfd = accept(sockfd, (sockaddr *) &cliAddr, &cliLength);
 		if(newsockfd < 0)
 			error("Error on accept");
+		debug("Forking");
 		int pid = fork();
 		if(pid < 0)
 		{
