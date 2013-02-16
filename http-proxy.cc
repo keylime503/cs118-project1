@@ -65,6 +65,8 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 
 void process(int clientSockfd)
 {
+	debug("In process");
+
 	//Read from socket
 	int buffSize, dataSize;
 	char * buffer = readResponse(clientSockfd, buffSize, dataSize);
@@ -80,6 +82,8 @@ void process(int clientSockfd)
 		debug(e.what());
 	}
 	
+	debug("After try-catch");
+
 	free(buffer);
 
 	//HTTP Request good, send to server
@@ -171,8 +175,9 @@ int main (int argc, char *argv[])
 
 	while (1)
 	{
-		debug("Accepting Socket");
+		debug("Top of while loop");
 		newsockfd = accept(sockfd, (sockaddr *) &cliAddr, &cliLength);
+		debug("Accepting Socket");
 		if(newsockfd < 0)
 			error("Error on accept");
 		debug("Forking");
