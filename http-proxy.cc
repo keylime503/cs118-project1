@@ -133,7 +133,7 @@ void process(int clientSockfd)
 		{
 			//persistentConnection = false;
 			debug("persistentConnection is FALSE!!!");
-			req.RemoveHeader("Connection");
+			//req.RemoveHeader("Connection");
 		}
 
 
