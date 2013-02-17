@@ -85,14 +85,17 @@ void process(int clientSockfd)
 
 	//debug("After readResponse()");
 
-	// Create HTTP Request object
+	// Create HTTP Request, Headers objects
 	HttpRequest req;
+	HttpHeaders hdrs;
 	try
 	{
 		req.ParseRequest(buffer, dataSize);
+		hdrs.ParseHeaders(buffer, dataSize);
 	}
 	catch(ParseException e)
 	{
+		cout << "In catch block!!!" << endl;
 		debug(e.what());
 	}
 	
