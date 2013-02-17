@@ -55,8 +55,8 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 	bzero(temp, tempSize);
 	bzero(buffer, buffSize);
 	
-	//while((bytesRead = recv(sockfd, temp, tempSize, MSG_DONTWAIT)) > 0)
-	//{
+	while((bytesRead = recv(sockfd, temp, tempSize, MSG_DONTWAIT)) > 0)
+	{
 		debug("BytesRead loop");
 
 		bytesRead = recv(sockfd, temp, tempSize, MSG_DONTWAIT);
@@ -77,10 +77,9 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 			buffer = bigBuffer;
 		}
 		//Add to buffer
-		cout << bytesRead << endl;
 		memcpy(buffer + dataSize, temp, bytesRead);
 		dataSize += bytesRead;
-	//}
+	}
 	debug("End of readResponse()");
 	free(temp);
 	return buffer;
@@ -91,11 +90,11 @@ void process(int clientSockfd)
 	/*time_t startTime, endTime;
 	time(&startTime);
 	double timeElapsed = 0;*/
-	//bool persistentConnection = true;
+	bool persistentConnection = true;
 
-	for (int i=0; i < 2; i++)
+	while(persistentConnection)
 	{
-		//debug("In process");
+		debug("In process loop");
 
 		// Timer
 		/*time(&endTime);
@@ -132,14 +131,12 @@ void process(int clientSockfd)
 		free(buffer);
 
 		// Check for persistent connection
-		string encodingHeader = req.FindHeader("Accept-Encoding");
 		string connHeader = req.FindHeader("Connection");
-		cout << "--- encoding value: " << encodingHeader << endl;
 		cout << "--- conn value: " << connHeader << endl;
 		if (connHeader == "close")
 		{
-			//persistentConnection = false;
-			debug("persistentConnection is FALSE!!!");
+			persistentConnection = false;
+			debug("close connection specified");
 			req.RemoveHeader("Connection");
 		}
 
@@ -209,7 +206,7 @@ void process(int clientSockfd)
 		//debug("bytesWritten to server. Before free now.");	
 
 		free(buffer);
-		sleep(5);
+		sleep(2);
 		// Listening to response from server
 		debug("Listening for response from server");
 		buffer = readResponse(servSockfd, buffSize, dataSize);
