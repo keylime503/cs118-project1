@@ -108,9 +108,9 @@ void process(int clientSockfd)
 		free(buffer);
 
 		// Check for persistent connection
-		string close = hdrs.FindHeader("Connection");
-		cout << "--- close value: " << close << endl;
-		if (close == "close")
+		string connHeader = hdrs.FindHeader("Connection");
+		cout << "--- close value: " << connHeader << endl;
+		if (connHeader == "close")
 		{
 			persistentConnection = false;
 			debug("persistentConnection is FALSE!!!");
