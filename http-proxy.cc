@@ -58,7 +58,7 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 	//{
 		debug("BytesRead loop");
 
-		bytesRead = recv(sockfd, temp, tempSize, MSG_DONTWAIT);
+		bytesRead = recv(sockfd, temp, tempSize, 0 /*MSG_DONTWAIT*/);
 
 		cout << "*** bytesRead: " << temp << "***" << endl;
 
