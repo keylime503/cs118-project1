@@ -58,7 +58,7 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 
 		bytesRead = read(sockfd, temp, tempSize);
 
-		cout << "*** bytesRead: " << temp << " *** << endl;"
+		cout << "*** bytesRead: " << temp << " ***" << endl;
 
 		//Check if buffer is big enough
 		if(buffSize < dataSize + bytesRead)
@@ -82,8 +82,8 @@ void process(int clientSockfd)
 {
 	/*time_t startTime, endTime;
 	time(&startTime);
-	double timeElapsed = 0;
-	bool persistentConnection = true;*/
+	double timeElapsed = 0;*/
+	bool persistentConnection = true;
 
 	//while (persistentConnection)
 	//{
