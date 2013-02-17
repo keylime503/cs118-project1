@@ -36,7 +36,7 @@ void error(string msg)
 //and dataSize to the amount of data. Caller must free the buffer.
 char * readResponse(int sockfd, int& buffSize, int& dataSize)
 {
-	debug("In readResponse()");
+	//debug("In readResponse()");
 
 	//TODO: Check for overflow problems
 
@@ -49,7 +49,7 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 	
 	//while((bytesRead = read(sockfd, temp, tempSize)) > 0)
 	//{
-		debug("BytesRead loop");
+		//debug("BytesRead loop");
 
 		bytesRead = read(sockfd, temp, tempSize);
 
@@ -66,20 +66,20 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 		memcpy(buffer + dataSize, temp, bytesRead);
 		dataSize += bytesRead;
 	//}
-	debug("End of readResponse()");
+	//debug("End of readResponse()");
 	free(temp);
 	return buffer;
 }
 
 void process(int clientSockfd)
 {
-	debug("In process");
+	//debug("In process");
 
 	//Read from socket
 	int buffSize, dataSize;
 	char * buffer = readResponse(clientSockfd, buffSize, dataSize);
 
-	debug("After readResponse()");
+	//debug("After readResponse()");
 
 	// Create HTTP Request object
 	HttpRequest req;
@@ -92,7 +92,7 @@ void process(int clientSockfd)
 		debug(e.what());
 	}
 	
-	debug("After try-catch");
+	//debug("After try-catch");
 
 	free(buffer);
 
@@ -106,7 +106,7 @@ void process(int clientSockfd)
 	req.FormatRequest(buffer);
 
 	// Send Request to server
-	debug("Sending request to server");
+	//debug("Sending request to server");
 	int servSockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if(servSockfd < 0)
 		error("Error opening socket to server");
@@ -125,16 +125,21 @@ void process(int clientSockfd)
       server->h_length);
 	serv_addr.sin_port = htons(port);
 
-	debug("Attempting to connect to server");
+	//debug("Attempting to connect to server");
 
 	if (connect(servSockfd,(sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
   		error("ERROR connecting");
+
+	debug("Connected to server. Attempting to write to server socket.");
 
   	int bytesWritten = write(servSockfd, buffer, bufLength);
   	if(bytesWritten < 0)
   	{
   		error("Error writing to servSockfd");
   	}
+
+	debug("bytesWritten to server. Before free now.");	
+
 	free(buffer);
 
 	// Listening to response from server
@@ -147,6 +152,8 @@ void process(int clientSockfd)
 	if(bytesWritten < 0)
 		error("Error writing to clientSockfd");
 
+
+	free(buffer);
 	debug("End of process()");
 	//cout << "Message: " << buffer << endl;
 }
@@ -192,7 +199,7 @@ int main (int argc, char *argv[])
 
 	while (1)
 	{
-		debug("Top of while loop");
+		//debug("Top of while loop");
 		newsockfd = accept(sockfd, (sockaddr *) &cliAddr, &cliLength);
 		debug("Accepting Socket");
 		if(newsockfd < 0)
