@@ -68,7 +68,7 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 		memcpy(buffer + dataSize, temp, bytesRead);
 		dataSize += bytesRead;
 	//}
-	debug("End of readResponse()");
+	//debug("End of readResponse()");
 	free(temp);
 	return buffer;
 }
@@ -81,7 +81,7 @@ void process(int clientSockfd)
 	int buffSize, dataSize;
 	char * buffer = readResponse(clientSockfd, buffSize, dataSize);
 
-	cout << buffer << endl;
+	cout << "Buffer w/ request from client: " << buffer << endl;
 
 	//debug("After readResponse()");
 
@@ -158,7 +158,7 @@ void process(int clientSockfd)
   		error("Error writing to servSockfd");
   	}
 
-	debug("bytesWritten to server. Before free now.");	
+	//debug("bytesWritten to server. Before free now.");	
 
 	free(buffer);
 
@@ -166,7 +166,7 @@ void process(int clientSockfd)
 	debug("Listening for response from server");
 	buffer = readResponse(servSockfd, buffSize, dataSize);
 
-	cout << "Buffer to client: " << buffer << endl;
+	cout << "Buffer w/ response for client: " << buffer << endl;
 
 	//Send back to client
 	debug("Sending response to client");
@@ -223,7 +223,7 @@ int main (int argc, char *argv[])
 		debug("Accepted Socket");
 		if(newsockfd < 0)
 			error("Error on accept");
-		debug("Forking");
+		//debug("Forking");
 		int pid = fork();
 		if(pid < 0)
 		{
