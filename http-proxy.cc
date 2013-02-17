@@ -43,10 +43,12 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 
 	//TODO: Check for overflow problems
 
+	int largeNum = 1024 * 1024;
+
 	dataSize = 0;
-	buffSize = 10240;
+	buffSize = largeNum;
 	int bytesRead = 0;
-	int tempSize = 10240;
+	int tempSize = largeNum;
 	char* temp = new char[tempSize];
 	char* buffer = new char[buffSize];
 	
@@ -55,6 +57,8 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 		//debug("BytesRead loop");
 
 		bytesRead = read(sockfd, temp, tempSize);
+
+		cout << "*** bytesRead: " << temp << " *** << endl;"
 
 		//Check if buffer is big enough
 		if(buffSize < dataSize + bytesRead)
@@ -82,16 +86,16 @@ void process(int clientSockfd)
 	bool persistentConnection = true;
 	char * buffer;
 
-	while (persistentConnection)
-	{
+	//while (persistentConnection)
+	//{
 		//debug("In process");
 
 		// Timer
-		time(&endTime);
+		/*time(&endTime);
 		timeElapsed = difftime(endTime, startTime);
 		cout << "timeElapsed: " << timeElapsed << endl;
 		if (timeElapsed > 5.0)
-			break;
+			break;*/
 
 		//Read from socket
 		int buffSize, dataSize;
@@ -208,7 +212,7 @@ void process(int clientSockfd)
 
 		free(buffer);
 		debug("End of request");
-	}
+	//}
 
 	debug("Closing connection");
 }
