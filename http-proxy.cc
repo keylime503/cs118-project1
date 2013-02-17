@@ -161,6 +161,7 @@ void process(int clientSockfd)
 	//debug("bytesWritten to server. Before free now.");	
 
 	free(buffer);
+	sleep(3);
 	usleep(500000);
 	// Listening to response from server
 	debug("Listening for response from server");
