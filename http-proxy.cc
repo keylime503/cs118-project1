@@ -131,7 +131,7 @@ void process(int clientSockfd)
 	{
 		error("No Such server");
 	}
-	
+	int servSockfd;	
 	for (rp = result; rp != NULL; rp = rp->ai_next) {
         servSockfd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
         if (servSockfd == -1)
