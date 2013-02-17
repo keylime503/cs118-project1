@@ -92,7 +92,7 @@ void process(int clientSockfd)
 	double timeElapsed = 0;*/
 	bool persistentConnection = true;
 
-	while(persistentConnection)
+	while(persistentConnection) // TODO: infinite for now!!!
 	{
 		debug("In process loop");
 
@@ -198,6 +198,9 @@ void process(int clientSockfd)
 		cout << "bufLength: " << bufLength << endl;
 
 	  	int bytesWritten = send(servSockfd, buffer, bufLength, 0);
+
+	  	cout << "bytesWritten: " << bytesWritten << endl;
+
 	  	if(bytesWritten < 0)
 	  	{
 	  		error("Error writing to servSockfd");
