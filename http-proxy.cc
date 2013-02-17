@@ -97,9 +97,14 @@ void process(int clientSockfd)
 	free(buffer);
 
 	// HTTP Request good, send to server
+	string path = req.GetPath();
 	string host = req.GetHost();
 	short port = req.GetPort();
 	
+	cout << "Path: " << path << endl;
+	cout << "Host: " << host << endl;
+	cout << "Port: " << port << endl;
+
 	// Create buffer for HTTPRequest object
 	size_t bufLength = req.GetTotalLength();
 	buffer = new char[bufLength];
