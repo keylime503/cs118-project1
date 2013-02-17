@@ -47,9 +47,11 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 	char* temp = new char[tempSize];
 	char* buffer = new char[buffSize];
 	
-	while((bytesRead = read(sockfd, temp, tempSize)) > 0)
-	{
+	//while((bytesRead = read(sockfd, temp, tempSize)) > 0)
+	//{
 		debug("BytesRead loop");
+
+		bytesRead = read(sockfd, temp, tempSize);
 
 		//Check if buffer is big enough
 		if(buffSize < dataSize + bytesRead)
@@ -63,7 +65,7 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 		//Add to buffer
 		memcpy(buffer + dataSize, temp, bytesRead);
 		dataSize += bytesRead;
-	}
+	//}
 	debug("End of readResponse()");
 	free(temp);
 	return buffer;
@@ -98,8 +100,6 @@ void process(int clientSockfd)
 	string host = req.GetHost();
 	short port = req.GetPort();
 	
-	free(buffer);
-	
 	// Create buffer for HTTPRequest object
 	size_t bufLength = req.GetTotalLength();
 	buffer = new char[bufLength];
@@ -124,6 +124,8 @@ void process(int clientSockfd)
       (char *)&serv_addr.sin_addr.s_addr,
       server->h_length);
 	serv_addr.sin_port = htons(port);
+
+	debug("Attempting to connect to server");
 
 	if (connect(servSockfd,(sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
   		error("ERROR connecting");
