@@ -86,7 +86,7 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 
 		bytesRead = read(sockfd, temp, tempSize);
 
-		debug("Bytes read: " + bytesRead);
+		cout << "Bytes read: " << bytesRead << endl;
 
 		cout << "*** bytesRead: " << temp << "***" << endl;
 
