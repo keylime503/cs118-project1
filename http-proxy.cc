@@ -83,7 +83,7 @@ void process(int clientSockfd)
 	/*time_t startTime, endTime;
 	time(&startTime);
 	double timeElapsed = 0;*/
-	bool persistentConnection = true;
+	//bool persistentConnection = true;
 
 	//while (persistentConnection)
 	//{
@@ -129,7 +129,7 @@ void process(int clientSockfd)
 		cout << "--- conn value: " << connHeader << endl;
 		if (connHeader == "close")
 		{
-			persistentConnection = false;
+			//persistentConnection = false;
 			debug("persistentConnection is FALSE!!!");
 		}
 
