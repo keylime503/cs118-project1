@@ -188,6 +188,8 @@ void process(int clientSockfd)
 		debug("Connected to server. Attempting to write to server socket.");
 
 		cout << "buff to server: " << buffer << endl;
+		cout << "servSockfd: " << servSockfd << endl;
+		cout << "bufLength: " << bufLength << endl;
 
 	  	int bytesWritten = write(servSockfd, buffer, bufLength);
 	  	if(bytesWritten < 0)
