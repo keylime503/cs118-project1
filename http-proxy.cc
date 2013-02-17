@@ -99,7 +99,7 @@ void process(int clientSockfd)
 	// HTTP Request good, send to server
 	string path = req.GetPath();
 	string host = req.GetHost();
-	short port = req.GetPort();
+	unsigned short port = req.GetPort();
 	
 	cout << "Path: " << path << endl;
 	cout << "Host: " << host << endl;
@@ -111,30 +111,41 @@ void process(int clientSockfd)
 	req.FormatRequest(buffer);
 
 	// Send Request to server
-	//debug("Sending request to server");
-	int servSockfd = socket(AF_INET, SOCK_STREAM, 0);
-	if(servSockfd < 0)
-		error("Error opening socket to server");
+	addrinfo hints;
+	addrinfo * result, rp;
+	memset(&hints, 0, sizeof(addrinfo));
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_flags = 0;
+	hints.ai_protocol = 0;
 
+	//Convert unsigned short port to c string
+	char portstr[10];
+	sprintf(portstr, "%u", port);
 
-	hostent *server = gethostbyname(host.c_str());
-	if(server == NULL)
+	s = getaddrinfo(host, portstr, &hints, &result);
+
+	if(s != 0)
 	{
 		error("No Such server");
 	}
+	
+	for (rp = result; rp != NULL; rp = rp->ai_next) {
+        servSockfd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
+        if (servSockfd == -1)
+            continue;
 
-	sockaddr_in serv_addr;
-	bzero((char *) &serv_addr, sizeof(serv_addr));
-	bcopy((char *)server->h_addr,
-      (char *)&serv_addr.sin_addr.s_addr,
-      server->h_length);
-	serv_addr.sin_port = htons(port);
+    	if (connect(servSockfd, rp->ai_addr, rp->ai_addrlen) != -1)
+            break;                  /* Success */
 
-	//debug("Attempting to connect to server");
+       close(servSockfd);
+    }
 
-	if (connect(servSockfd,(sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
-  		error("ERROR connecting");
+    if (rp == NULL) {               /* No address succeeded */
+        error("Could not connect");
+    }
 
+    free(result);
 	debug("Connected to server. Attempting to write to server socket.");
 
   	int bytesWritten = write(servSockfd, buffer, bufLength);
