@@ -54,7 +54,7 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 	bzero(temp, tempSize);
 	bzero(buffer, buffSize);
 	
-	while((bytesRead = recv(sockfd, temp, tempSize)) > 0)
+	while((bytesRead = recv(sockfd, temp, tempSize, 0)) > 0)
 	{
 		debug("BytesRead loop");
 
@@ -193,7 +193,7 @@ void process(int clientSockfd)
 		cout << "servSockfd: " << servSockfd << endl;
 		cout << "bufLength: " << bufLength << endl;
 
-	  	int bytesWritten = send(servSockfd, buffer, bufLength);
+	  	int bytesWritten = send(servSockfd, buffer, bufLength, 0);
 	  	if(bytesWritten < 0)
 	  	{
 	  		error("Error writing to servSockfd");
@@ -211,7 +211,7 @@ void process(int clientSockfd)
 
 		//Send back to client
 		debug("Sending response to client");
-		bytesWritten = send(clientSockfd, buffer, dataSize);
+		bytesWritten = send(clientSockfd, buffer, dataSize, 0);
 		if(bytesWritten < 0)
 			error("Error writing to clientSockfd");
 
