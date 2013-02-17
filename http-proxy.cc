@@ -73,6 +73,7 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 			buffer = bigBuffer;
 		}
 		//Add to buffer
+		cout << bytesRead << endl;
 		memcpy(buffer + dataSize, temp, bytesRead);
 		dataSize += bytesRead;
 	//}
