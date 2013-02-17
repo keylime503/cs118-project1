@@ -86,9 +86,10 @@ void process(int clientSockfd)
 		//debug("In process");
 
 		// Timer
-
 		time(&endTime);
-		if ((timeElapsed = difftime(endTime, startTime)) > 5.0)
+		timeElapsed = difftime(endTime, startTime);
+		cout << "timeElapsed: " << timeElapsed << endl;
+		if (timeElapsed > 5.0)
 			break;
 
 		//Read from socket
