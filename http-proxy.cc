@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 
 #include <iostream>
+#include <cstdio>
 #include <string>
 #include <unistd.h>
 #include <stdlib.h>
@@ -123,7 +124,7 @@ void process(int clientSockfd)
 	char portstr[10];
 	sprintf(portstr, "%u", port);
 
-	s = getaddrinfo(host, portstr, &hints, &result);
+	int s = getaddrinfo(host.c_str(), portstr, &hints, &result);
 
 	if(s != 0)
 	{
