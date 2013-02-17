@@ -80,11 +80,10 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 
 void process(int clientSockfd)
 {
-	time_t startTime, endTime;
+	/*time_t startTime, endTime;
 	time(&startTime);
 	double timeElapsed = 0;
-	bool persistentConnection = true;
-	char * buffer;
+	bool persistentConnection = true;*/
 
 	//while (persistentConnection)
 	//{
@@ -99,7 +98,7 @@ void process(int clientSockfd)
 
 		//Read from socket
 		int buffSize, dataSize;
-		buffer = readResponse(clientSockfd, buffSize, dataSize);
+		char * buffer = readResponse(clientSockfd, buffSize, dataSize);
 
 		cout << "Buffer w/ request from client: " << buffer << endl;
 
