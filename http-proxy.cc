@@ -43,7 +43,7 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 
 	//TODO: Check for overflow problems
 
-	int largeNum = 1024 * 1024;
+	int largeNum = 65535;
 
 	dataSize = 0;
 	buffSize = largeNum;
@@ -51,16 +51,14 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 	int tempSize = largeNum;
 	char* temp = new char[tempSize];
 	char* buffer = new char[buffSize];
+	bzero(temp, tempSize);
+	bzero(buffer, buffSize);
 	
-	//while((bytesRead = read(sockfd, temp, tempSize)) > 0)
-	//{
-		//debug("BytesRead loop");
+	while((bytesRead = read(sockfd, temp, tempSize)) > 0)
+	{
+		debug("BytesRead loop");
 
-		cout << "sockfd: " << sockfd << endl;
-		cout << "temp: " << temp << endl;
-		cout << "tempSize: " << tempSize << endl;
-
-		bytesRead = read(sockfd, temp, tempSize);
+		//bytesRead = read(sockfd, temp, tempSize);
 
 		cout << "*** bytesRead: " << temp << "***" << endl;
 
@@ -76,8 +74,8 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 		//Add to buffer
 		memcpy(buffer + dataSize, temp, bytesRead);
 		dataSize += bytesRead;
-	//}
-	//debug("End of readResponse()");
+	}
+	debug("End of readResponse()");
 	free(temp);
 	return buffer;
 }
