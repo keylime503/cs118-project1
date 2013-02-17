@@ -85,8 +85,8 @@ void process(int clientSockfd)
 	double timeElapsed = 0;*/
 	//bool persistentConnection = true;
 
-	//while (persistentConnection)
-	//{
+	for (int i=0; i < 2; i++)
+	{
 		//debug("In process");
 
 		// Timer
@@ -100,7 +100,7 @@ void process(int clientSockfd)
 		int buffSize, dataSize;
 		char * buffer = readResponse(clientSockfd, buffSize, dataSize);
 
-		cout << "Buffer w/ request from client: " << buffer << endl;
+		//cout << "Buffer w/ request from client: " << buffer << endl;
 
 		//debug("After readResponse()");
 
@@ -139,9 +139,9 @@ void process(int clientSockfd)
 		string host = req.GetHost();
 		unsigned short port = req.GetPort();
 		
-		cout << "Path: " << path << endl;
-		cout << "Host: " << host << endl;
-		cout << "Port: " << port << endl;
+		//cout << "Path: " << path << endl;
+		//cout << "Host: " << host << endl;
+		//cout << "Port: " << port << endl;
 
 		// Create buffer for HTTPRequest object
 		size_t bufLength = req.GetTotalLength();
@@ -200,7 +200,7 @@ void process(int clientSockfd)
 		debug("Listening for response from server");
 		buffer = readResponse(servSockfd, buffSize, dataSize);
 
-		cout << "Buffer w/ response for client: " << buffer << endl;
+		//cout << "Buffer w/ response for client: " << buffer << endl;
 
 		//Send back to client
 		debug("Sending response to client");
@@ -211,7 +211,7 @@ void process(int clientSockfd)
 
 		free(buffer);
 		debug("End of request");
-	//}
+	}
 
 	debug("Closing connection");
 }
