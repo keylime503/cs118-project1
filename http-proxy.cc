@@ -75,112 +75,128 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 
 void process(int clientSockfd)
 {
-	//debug("In process");
+	bool persistentConnection = true;
 
-	//Read from socket
-	int buffSize, dataSize;
-	char * buffer = readResponse(clientSockfd, buffSize, dataSize);
-
-	cout << "Buffer w/ request from client: " << buffer << endl;
-
-	//debug("After readResponse()");
-
-	// Create HTTP Request, Headers objects
-	HttpRequest req;
-	HttpHeaders hdrs;
-	try
+	while (persistentConnection)
 	{
-		req.ParseRequest(buffer, dataSize);
-		hdrs.ParseHeaders(buffer, dataSize);
+		//debug("In process");
+
+		//Read from socket
+		int buffSize, dataSize;
+		char * buffer = readResponse(clientSockfd, buffSize, dataSize);
+
+		cout << "Buffer w/ request from client: " << buffer << endl;
+
+		//debug("After readResponse()");
+
+		// Create HTTP Request, Headers objects
+		HttpRequest req;
+		HttpHeaders hdrs;
+		try
+		{
+			req.ParseRequest(buffer, dataSize);
+			hdrs.ParseHeaders(buffer, dataSize);
+		}
+		catch(ParseException e)
+		{
+			cout << "In catch block!!!" << endl;
+			debug(e.what());
+		}
+		
+		//debug("After try-catch");
+
+		free(buffer);
+
+		// Check for persistent connection
+		string close = hdrs.FindHeader("Connection");
+		cout << "--- close value: " << close << endl;
+		if (close == "close")
+		{
+			persistentConnection = false;
+			debug("persistentConnection is FALSE!!!");
+		}
+
+
+		// HTTP Request good, send to server
+		string path = req.GetPath();
+		string host = req.GetHost();
+		unsigned short port = req.GetPort();
+		
+		cout << "Path: " << path << endl;
+		cout << "Host: " << host << endl;
+		cout << "Port: " << port << endl;
+
+		// Create buffer for HTTPRequest object
+		size_t bufLength = req.GetTotalLength();
+		buffer = new char[bufLength];
+		req.FormatRequest(buffer);
+
+		// Send Request to server
+		addrinfo hints;
+		addrinfo * result, * rp;
+		memset(&hints, 0, sizeof(addrinfo));
+		hints.ai_family = AF_UNSPEC;
+		hints.ai_socktype = SOCK_STREAM;
+		hints.ai_flags = 0;
+		hints.ai_protocol = 0;
+
+		//Convert unsigned short port to c string
+		char portstr[10];
+		sprintf(portstr, "%u", port);
+
+		int s = getaddrinfo(host.c_str(), portstr, &hints, &result);
+
+		if(s != 0)
+		{
+			error("No Such server");
+		}
+		int servSockfd;	
+		for (rp = result; rp != NULL; rp = rp->ai_next) {
+	        servSockfd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
+	        if (servSockfd == -1)
+	            continue;
+
+	    	if (connect(servSockfd, rp->ai_addr, rp->ai_addrlen) != -1)
+	            break;                  /* Success */
+
+	       close(servSockfd);
+	    }
+
+	    if (rp == NULL) {               /* No address succeeded */
+	        error("Could not connect");
+	    }
+
+	    free(result);
+		debug("Connected to server. Attempting to write to server socket.");
+
+	  	int bytesWritten = write(servSockfd, buffer, bufLength);
+	  	if(bytesWritten < 0)
+	  	{
+	  		error("Error writing to servSockfd");
+	  	}
+
+		//debug("bytesWritten to server. Before free now.");	
+
+		free(buffer);
+		sleep(2);
+		// Listening to response from server
+		debug("Listening for response from server");
+		buffer = readResponse(servSockfd, buffSize, dataSize);
+
+		cout << "Buffer w/ response for client: " << buffer << endl;
+
+		//Send back to client
+		debug("Sending response to client");
+		bytesWritten = write(clientSockfd, buffer, dataSize);
+		if(bytesWritten < 0)
+			error("Error writing to clientSockfd");
+
+
+		free(buffer);
+		debug("End of request");
 	}
-	catch(ParseException e)
-	{
-		cout << "In catch block!!!" << endl;
-		debug(e.what());
-	}
-	
-	//debug("After try-catch");
 
-	free(buffer);
-
-	// HTTP Request good, send to server
-	string path = req.GetPath();
-	string host = req.GetHost();
-	unsigned short port = req.GetPort();
-	
-	cout << "Path: " << path << endl;
-	cout << "Host: " << host << endl;
-	cout << "Port: " << port << endl;
-
-	// Create buffer for HTTPRequest object
-	size_t bufLength = req.GetTotalLength();
-	buffer = new char[bufLength];
-	req.FormatRequest(buffer);
-
-	// Send Request to server
-	addrinfo hints;
-	addrinfo * result, * rp;
-	memset(&hints, 0, sizeof(addrinfo));
-	hints.ai_family = AF_UNSPEC;
-	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_flags = 0;
-	hints.ai_protocol = 0;
-
-	//Convert unsigned short port to c string
-	char portstr[10];
-	sprintf(portstr, "%u", port);
-
-	int s = getaddrinfo(host.c_str(), portstr, &hints, &result);
-
-	if(s != 0)
-	{
-		error("No Such server");
-	}
-	int servSockfd;	
-	for (rp = result; rp != NULL; rp = rp->ai_next) {
-        servSockfd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
-        if (servSockfd == -1)
-            continue;
-
-    	if (connect(servSockfd, rp->ai_addr, rp->ai_addrlen) != -1)
-            break;                  /* Success */
-
-       close(servSockfd);
-    }
-
-    if (rp == NULL) {               /* No address succeeded */
-        error("Could not connect");
-    }
-
-    free(result);
-	debug("Connected to server. Attempting to write to server socket.");
-
-  	int bytesWritten = write(servSockfd, buffer, bufLength);
-  	if(bytesWritten < 0)
-  	{
-  		error("Error writing to servSockfd");
-  	}
-
-	//debug("bytesWritten to server. Before free now.");	
-
-	free(buffer);
-	sleep(2);
-	// Listening to response from server
-	debug("Listening for response from server");
-	buffer = readResponse(servSockfd, buffSize, dataSize);
-
-	cout << "Buffer w/ response for client: " << buffer << endl;
-
-	//Send back to client
-	debug("Sending response to client");
-	bytesWritten = write(clientSockfd, buffer, dataSize);
-	if(bytesWritten < 0)
-		error("Error writing to clientSockfd");
-
-
-	free(buffer);
-	debug("End of process()");
-	//cout << "Message: " << buffer << endl;
+	debug("Closing connection");
 }
 
 int main (int argc, char *argv[])
