@@ -218,6 +218,7 @@ void process(int clientSockfd)
 
 		free(buffer);
 		debug("End of request");
+		sleep(5);
 	}
 
 	debug("Closing connection");
