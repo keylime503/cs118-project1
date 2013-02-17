@@ -59,7 +59,7 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 	{
 		debug("BytesRead loop");
 
-		bytesRead = recv(sockfd, temp, tempSize, MSG_DONTWAIT);
+		//bytesRead = recv(sockfd, temp, tempSize, MSG_DONTWAIT);
 
 		if (bytesRead < 0)
 			cout << "ERRNO: " << errno << endl;
