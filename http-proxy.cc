@@ -54,7 +54,7 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 	bzero(temp, tempSize);
 	bzero(buffer, buffSize);
 	
-	while((bytesRead = recv(sockfd, temp, tempSize, 0)) > 0)
+	while((bytesRead = recv(sockfd, temp, tempSize, MSG_DONTWAIT)) > 0)
 	{
 		debug("BytesRead loop");
 
