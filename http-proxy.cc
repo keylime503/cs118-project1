@@ -91,11 +91,11 @@ void process(int clientSockfd)
 
 		// Create HTTP Request, Headers objects
 		HttpRequest req;
-		HttpHeaders hdrs;
+		//HttpHeaders hdrs;
 		try
 		{
 			req.ParseRequest(buffer, dataSize);
-			hdrs.ParseHeaders(buffer, dataSize);
+			//req.ParseHeaders(buffer, dataSize);
 		}
 		catch(ParseException e)
 		{
@@ -108,7 +108,7 @@ void process(int clientSockfd)
 		free(buffer);
 
 		// Check for persistent connection
-		string connHeader = hdrs.FindHeader("Connection");
+		string connHeader = req.FindHeader("Connection");
 		cout << "--- close value: " << connHeader << endl;
 		if (connHeader == "close")
 		{
