@@ -108,8 +108,10 @@ void process(int clientSockfd)
 		free(buffer);
 
 		// Check for persistent connection
+		string encodingHeader = req.FindHeader("Accept-Encoding");
 		string connHeader = req.FindHeader("Connection");
-		cout << "--- close value: " << connHeader << endl;
+		cout << "--- encoding value: " << encodingHeader << endl;
+		cout << "--- conn value: " << connHeader << endl;
 		if (connHeader == "close")
 		{
 			persistentConnection = false;
