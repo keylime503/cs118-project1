@@ -184,6 +184,8 @@ datafile = open("./basic3", "r")
 cdata = datafile.read()
 if(end - start) < 4 and client3.data == cdata and client4.data == cdata:
     r = True
+if(end - start) < 4:
+    print "Too Long"
 if r:
     print "Concurrent Connection: [" + bcolors.PASS + "PASSED" + bcolors.ENDC + "]"
 else:
