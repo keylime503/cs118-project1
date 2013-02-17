@@ -11,6 +11,7 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <ctime>
+#include <errno.h>
 
 
 #include "http-headers.h"
@@ -59,6 +60,9 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 		debug("BytesRead loop");
 
 		bytesRead = recv(sockfd, temp, tempSize, MSG_DONTWAIT);
+
+		if (bytesRead < 0)
+			cout << "ERRNO: " << errno << endl;
 
 		cout << "*** bytesRead: " << temp << "***" << endl;
 
