@@ -10,6 +10,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
+#include <ctime>
 
 
 #include "http-headers.h"
@@ -75,11 +76,20 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 
 void process(int clientSockfd)
 {
+	time_t startTime, endTime;
+	time(&startTime);
+	double timeElapsed = 0;
 	bool persistentConnection = true;
 
 	while (persistentConnection)
 	{
 		//debug("In process");
+
+		// Timer
+
+		time(&endTime);
+		if ((timeElapsed = difftime(endTime, startTime)) > 5.0)
+			break;
 
 		//Read from socket
 		int buffSize, dataSize;
