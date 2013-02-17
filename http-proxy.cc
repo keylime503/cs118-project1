@@ -43,9 +43,9 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 	//TODO: Check for overflow problems
 
 	dataSize = 0;
-	buffSize = 1024;
+	buffSize = 10240;
 	int bytesRead = 0;
-	int tempSize = 1024;
+	int tempSize = 10240;
 	char* temp = new char[tempSize];
 	char* buffer = new char[buffSize];
 	
@@ -68,7 +68,7 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 		memcpy(buffer + dataSize, temp, bytesRead);
 		dataSize += bytesRead;
 	//}
-	//debug("End of readResponse()");
+	debug("End of readResponse()");
 	free(temp);
 	return buffer;
 }
@@ -80,6 +80,8 @@ void process(int clientSockfd)
 	//Read from socket
 	int buffSize, dataSize;
 	char * buffer = readResponse(clientSockfd, buffSize, dataSize);
+
+	cout << buffer << endl;
 
 	//debug("After readResponse()");
 
@@ -163,6 +165,8 @@ void process(int clientSockfd)
 	// Listening to response from server
 	debug("Listening for response from server");
 	buffer = readResponse(servSockfd, buffSize, dataSize);
+
+	cout << "Buffer to client: " << buffer << endl;
 
 	//Send back to client
 	debug("Sending response to client");
