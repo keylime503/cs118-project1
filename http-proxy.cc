@@ -209,7 +209,7 @@ void process(int clientSockfd)
 		//debug("bytesWritten to server. Before free now.");	
 
 		free(buffer);
-		sleep(2);
+		sleep(5);
 		// Listening to response from server
 		debug("Listening for response from server");
 		buffer = readResponse(servSockfd, buffSize, dataSize);
