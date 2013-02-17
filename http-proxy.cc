@@ -43,7 +43,7 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 
 	//TODO: Check for overflow problems
 
-	int largeNum = 65535;
+	int largeNum = 1024;
 
 	dataSize = 0;
 	buffSize = largeNum;
@@ -54,17 +54,18 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 	bzero(temp, tempSize);
 	bzero(buffer, buffSize);
 	
-	while((bytesRead = recv(sockfd, temp, tempSize, MSG_DONTWAIT)) > 0)
-	{
+	//while((bytesRead = recv(sockfd, temp, tempSize, MSG_DONTWAIT)) > 0)
+	//{
 		debug("BytesRead loop");
 
-		//bytesRead = read(sockfd, temp, tempSize);
+		bytesRead = recv(sockfd, temp, tempSize, MSG_DONTWAIT);
 
 		cout << "*** bytesRead: " << temp << "***" << endl;
 
 		//Check if buffer is big enough
 		if(buffSize < dataSize + bytesRead)
 		{
+			debug("*** resizing buffer ***");
 			char* bigBuffer = new char[buffSize * 2];
 			memcpy(buffer, bigBuffer, dataSize);
 			buffSize *= 2;
@@ -74,7 +75,7 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 		//Add to buffer
 		memcpy(buffer + dataSize, temp, bytesRead);
 		dataSize += bytesRead;
-	}
+	//}
 	debug("End of readResponse()");
 	free(temp);
 	return buffer;
@@ -99,7 +100,8 @@ void process(int clientSockfd)
 			break;*/
 
 		//Read from socket
-		int buffSize, dataSize;
+		int buffSize = 0; 
+		int dataSize = 0;
 		char * buffer = readResponse(clientSockfd, buffSize, dataSize);
 
 		//cout << "Buffer w/ request from client: " << buffer << endl;
@@ -189,7 +191,7 @@ void process(int clientSockfd)
 	    free(result);
 		debug("Connected to server. Attempting to write to server socket.");
 
-		cout << "buff to server: " << buffer << endl;
+		cout << "*** buff to server: " << buffer << "***" << endl;
 		cout << "servSockfd: " << servSockfd << endl;
 		cout << "bufLength: " << bufLength << endl;
 
@@ -207,7 +209,7 @@ void process(int clientSockfd)
 		debug("Listening for response from server");
 		buffer = readResponse(servSockfd, buffSize, dataSize);
 
-		//cout << "Buffer w/ response for client: " << buffer << endl;
+		cout << "Buffer w/ response for client: " << buffer << endl;
 
 		//Send back to client
 		debug("Sending response to client");
