@@ -41,18 +41,15 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 	//TODO: Check for overflow problems
 
 	dataSize = 0;
+	buffSize = 1024;
 	int bytesRead = 0;
 	int tempSize = 1024;
 	char* temp = new char[tempSize];
 	char* buffer = new char[buffSize];
 	
-	//while(1)
-	//{
-		debug("Before");
-		bytesRead = read(sockfd, temp, tempSize);
-		debug("After");
-		cout << "Bytes Read: " << bytesRead << endl;
-		cout << "Buffer: " << temp << endl;
+	while((bytesRead = read(sockfd, temp, tempSize)) > 0)
+	{
+		debug("BytesRead loop");
 
 		//Check if buffer is big enough
 		if(buffSize < dataSize + bytesRead)
@@ -66,8 +63,7 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 		//Add to buffer
 		memcpy(buffer + dataSize, temp, bytesRead);
 		dataSize += bytesRead;
-		debug("End of bytesRead loop");
-	//}
+	}
 	debug("End of readResponse()");
 	free(temp);
 	return buffer;
@@ -96,10 +92,9 @@ void process(int clientSockfd)
 	
 	debug("After try-catch");
 
+	free(buffer);
 
-	debug("After first free");
-
-	//HTTP Request good, send to server
+	// HTTP Request good, send to server
 	string host = req.GetHost();
 	short port = req.GetPort();
 	
@@ -110,7 +105,7 @@ void process(int clientSockfd)
 	buffer = new char[bufLength];
 	req.FormatRequest(buffer);
 
-	//Send Request to server
+	// Send Request to server
 	debug("Sending request to server");
 	int servSockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if(servSockfd < 0)
