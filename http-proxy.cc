@@ -114,7 +114,7 @@ void process(int clientSockfd)
 
 	// Send Request to server
 	addrinfo hints;
-	addrinfo * result, rp;
+	addrinfo * result, * rp;
 	memset(&hints, 0, sizeof(addrinfo));
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
