@@ -58,7 +58,7 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 
 		bytesRead = read(sockfd, temp, tempSize);
 
-		cout << "*** bytesRead: " << temp << " ***" << endl;
+		cout << "*** bytesRead: " << temp << "***" << endl;
 
 		//Check if buffer is big enough
 		if(buffSize < dataSize + bytesRead)
@@ -185,6 +185,8 @@ void process(int clientSockfd)
 
 	    free(result);
 		debug("Connected to server. Attempting to write to server socket.");
+
+		cout << "buff to server: " << buffer << endl;
 
 	  	int bytesWritten = write(servSockfd, buffer, bufLength);
 	  	if(bytesWritten < 0)
