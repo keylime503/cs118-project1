@@ -125,8 +125,6 @@ void process(int clientSockfd)
 			cout << "In catch block!!!" << endl;
 			debug(e.what());
 		}
-		
-		//debug("After try-catch");
 
 		free(buffer);
 
@@ -139,6 +137,10 @@ void process(int clientSockfd)
 			debug("close connection specified");
 			req.RemoveHeader("Connection");
 		}
+
+		// Check for conditional get
+		
+
 
 
 		// HTTP Request good, send to server
@@ -222,7 +224,6 @@ void process(int clientSockfd)
 		bytesWritten = send(clientSockfd, buffer, dataSize, 0);
 		if(bytesWritten < 0)
 			error("Error writing to clientSockfd");
-
 
 		free(buffer);
 		debug("End of request");
