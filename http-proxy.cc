@@ -103,7 +103,7 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize, int type)
 
 	/* Found empty line, ok to parse */
 	totalLength = (position - buffer) + sizeof("\r\n\r\n");
-	String contentLength = "";
+	string contentLength = "";
 	if (type == 0) // HTTP Request
 	{
 		HttpRequest req;
@@ -150,7 +150,7 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize, int type)
 				free(buffer);
 				buffer = bigBuffer;
 			}
-			
+
 			//Add to buffer
 			memcpy(buffer + dataSize, temp, bytesRead);
 			dataSize += bytesRead;
