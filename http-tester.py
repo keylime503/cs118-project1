@@ -152,13 +152,13 @@ server1.start()
 server2.start()
 
 
-client1 = ClientThread("127.0.0.1:" + pport, "http://127.0.0.1:" + sport1 + "/basic", "./basic")
-client1.start()
-client1.join()
-if client1.result:
-    print "Basic object fetching: [" + bcolors.PASS + "PASSED" + bcolors.ENDC + "]" 
-else: 
-    print "Basic object fetching: [" + bcolors.FAIL + "FAILED" + bcolors.ENDC + "]"
+# client1 = ClientThread("127.0.0.1:" + pport, "http://127.0.0.1:" + sport1 + "/basic", "./basic")
+# client1.start()
+# client1.join()
+# if client1.result:
+#     print "Basic object fetching: [" + bcolors.PASS + "PASSED" + bcolors.ENDC + "]" 
+# else: 
+#     print "Basic object fetching: [" + bcolors.FAIL + "FAILED" + bcolors.ENDC + "]"
 
 client2 = ClientPersistThread("127.0.0.1:" + pport, "http://127.0.0.1:" + sport1 + "/basic", "./basic", "http://127.0.0.1:" + sport1 + "/basic2", "./basic2")
 client2.start()
