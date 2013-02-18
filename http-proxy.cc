@@ -86,12 +86,15 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 
 		cout << "tempSize: " << tempSize << endl;
 
-		bytesRead = read(sockfd, temp, tempSize);
+		bytesRead = recv(sockfd, temp, tempSize, 0);
 
 		if (bytesRead < 0)
 			error("Error reading from socket");
 		else if (bytesRead == 0)
+		{
+			debug("ZERO bytes read");
 			sleep(5);
+		}
 
 		cout << "Bytes read: " << bytesRead << endl;
 
