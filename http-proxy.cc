@@ -108,7 +108,7 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize, int type)
 
 	/* Found empty line, ok to parse */
 	//totalLength = (position - buffer) + sizeof("\r\n\r\n");
-	//string contentLength = "";
+	string contentLength = "";
 	if (type == 0) // HTTP Request
 	{
 		HttpRequest req;
