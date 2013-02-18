@@ -160,13 +160,13 @@ if client1.result:
 else: 
     print "Basic object fetching: [" + bcolors.FAIL + "FAILED" + bcolors.ENDC + "]"
 
-# client2 = ClientPersistThread("127.0.0.1:" + pport, "http://127.0.0.1:" + sport1 + "/basic", "./basic", "http://127.0.0.1:" + sport1 + "/basic2", "./basic2")
-# client2.start()
-# client2.join()
-# if client2.result:
-#     print "Persistent Connection: [" + bcolors.PASS + "PASSED" + bcolors.ENDC + "]"
-# else:
-#     print "Persistent Connection: [" + bcolors.FAIL + "FAILED" + bcolors.ENDC + "]"
+client2 = ClientPersistThread("127.0.0.1:" + pport, "http://127.0.0.1:" + sport1 + "/basic", "./basic", "http://127.0.0.1:" + sport1 + "/basic2", "./basic2")
+client2.start()
+client2.join()
+if client2.result:
+    print "Persistent Connection: [" + bcolors.PASS + "PASSED" + bcolors.ENDC + "]"
+else:
+    print "Persistent Connection: [" + bcolors.FAIL + "FAILED" + bcolors.ENDC + "]"
 
 client3 = ClientThread("127.0.0.1:" + pport, "http://127.0.0.1:"+ sport1 +"/basic3", "./basic3")
 client4 = ClientThread("127.0.0.1:" + pport, "http://127.0.0.1:"+ sport2 +"/basic3", "./basic3")

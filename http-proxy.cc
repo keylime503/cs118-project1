@@ -395,7 +395,8 @@ void process(int clientSockfd)
 			error("Error writing to clientSockfd");
 
 		free(buffer);
-		debug("End of request");
+		debug("End of request. Closing socket to server.");
+		close(servSockfd);
 		debug("*********************************************");
 		sleep(5);
 	}
