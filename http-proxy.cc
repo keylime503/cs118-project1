@@ -104,28 +104,32 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize, int type)
 			cout << "position: " << position << endl;
 	}
 
+	cout << "type: " << type << endl;
+
 	/* Found empty line, ok to parse */
-	totalLength = (position - buffer) + sizeof("\r\n\r\n");
-	string contentLength = "";
+	//totalLength = (position - buffer) + sizeof("\r\n\r\n");
+	//string contentLength = "";
 	if (type == 0) // HTTP Request
 	{
 		HttpRequest req;
 		req.ParseRequest(buffer, dataSize);
+		totalLength = req.GetTotalLength();
 		contentLength = req.FindHeader("Content-Length");
-		if (contentLength != "")
-		{
-			 totalLength += atoi(contentLength.c_str());
-		}
+		// if (contentLength != "")
+		// {
+		// 	 totalLength += atoi(contentLength.c_str());
+		// }
 	}
 	else if (type == 1) // HTTP Response
 	{
 		HttpResponse res;
 		res.ParseResponse(buffer, dataSize);
+		totalLength = res.GetTotalLength();
 		contentLength = res.FindHeader("Content-Length");
-		if (contentLength != "")
-		{
-			 totalLength += atoi(contentLength.c_str());
-		}
+		// if (contentLength != "")
+		// {
+		// 	 totalLength += atoi(contentLength.c_str());
+		// }
 	}
 	else // Should never happen
 		error("Invalid readResponse() parameter");
@@ -135,6 +139,8 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize, int type)
 	/* If there is content, we may not have read enough data yet */
 	if (contentLength != "")
 	{
+		debug("In second while loop");
+
 		while(totalLength > dataSize)
 		{
 			bytesRead = read(sockfd, temp, tempSize);
