@@ -191,6 +191,20 @@ void process(int clientSockfd)
 			debug("close connection specified");
 		}
 
+		//Check cache for item
+		//Open file for item
+		//If item exists in cache
+			//If item is expired
+				//Append to request if-modified-since-expire-time
+				//Send request to server
+				//If response is 300
+					//reset expire time
+				//Else
+					//replace cached item 
+		//Else
+		//Send request to server, store in cache
+		//Send item back to client
+
 		// HTTP Request good, send to server
 		string path = req.GetPath();
 		string host = req.GetHost();
