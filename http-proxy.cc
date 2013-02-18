@@ -117,8 +117,9 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 		}
 		
 		/* Get content length */
-		int headerLength = hdr.getTotalLength();
-		int contentLength = 8*(atoi(hdr.FindHeader("Content-Length"))); // IN 8-BYTE OCTETS!!!
+		int headerLength = hdr.GetTotalLength();
+		string cl = hdr.FindHeader("Content-Length");
+		int contentLength = 8*(atoi(cl.c_str())); // IN 8-BYTE OCTETS!!!
 
 		if (headerLength == "" || contentLength == "")
 			error("Cannot find length header(s)");
