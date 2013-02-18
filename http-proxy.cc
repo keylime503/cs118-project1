@@ -141,6 +141,9 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize, int type)
 	{
 		debug("In second while loop");
 
+		cout << "totalLength: " << totalLength << endl;
+		cout << "dataSize: " << dataSize << endl;
+
 		while(totalLength > dataSize)
 		{
 			bytesRead = read(sockfd, temp, tempSize);
