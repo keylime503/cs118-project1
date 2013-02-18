@@ -125,7 +125,7 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 		{
 			//cout << "In catch block!!!" << endl;
 			//debug(e.what());
-			//continue;
+			continue;
 		}
 		
 		/* Get content length */
