@@ -103,33 +103,33 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 		dataSize += bytesRead;
 
 		/* Check for content-length header */
-		string input = buffer;
-		size_t found = input.find("\r\n\r\n");
-		if (found != npos)
+		HTTPHeaders hdr;
+
+		try
 		{
-			/* \r\n\r\n found in buffer */
-			HttpRequest req;
-			try
-			{
-				req.ParseRequest(buffer, dataSize);
-				//req.ParseHeaders(buffer, dataSize);
-			}
-			catch(ParseException e)
-			{
-				cout << "In catch block!!!" << endl;
-				debug(e.what());
-			}
-			
-			/* Get content length */
-			int contentLength = atoi(req.FindHeader("Content-Length")); // IN 8-BYTE OCTETS!!!
-			if (contentLength != "")
-			{
-				cout << "contentLength: " << contentLength << endl;
-
-				int totalLength = npos + sizeof("\r\n\r\n") + contentLength;
-
-				cout << "totalLength: " << totalLength << endl;
+			hdr.ParseHeaders(buffer, dataSize);
 		}
+		catch(ParseException e)
+		{
+			cout << "In catch block!!!" << endl;
+			debug(e.what());
+			continue;
+		}
+		
+		/* Get content length */
+		int headerLength = hdr.getTotalLength();
+		int contentLength = 8*(atoi(hdr.FindHeader("Content-Length"))); // IN 8-BYTE OCTETS!!!
+
+		if (headerLength == "" || contentLength == "")
+			error("Cannot find length header(s)");
+
+		int totalLength = headerLength + contentLength;
+		cout << "contentLength: " << contentLength << endl;
+		cout << "headerLength: " << headerLength << endl;
+		cout << "totalLength: " << totalLength << endl;
+
+		if (dataSize >= totalLength)
+			break;
 	}
 	debug("End of readResponse()");
 	free(temp);
