@@ -103,7 +103,8 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 		dataSize += bytesRead;
 
 		/* Check for content-length header */
-		size_t found = buffer.find("\r\n\r\n");
+		string input = buffer;
+		size_t found = input.find("\r\n\r\n");
 		if (found != npos)
 		{
 			/* \r\n\r\n found in buffer */
