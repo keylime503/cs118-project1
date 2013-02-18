@@ -8,6 +8,7 @@
 #include <cstring>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/select.h>
 #include <netinet/in.h>
 #include <netdb.h>
 #include <ctime>
@@ -55,14 +56,37 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 	bzero(temp, tempSize);
 	bzero(buffer, buffSize);
 	
-	while((bytesRead = recv(sockfd, temp, tempSize, MSG_DONTWAIT)) > 0)
+	while(1)
 	{
 		debug("BytesRead loop");
 
-		//bytesRead = recv(sockfd, temp, tempSize, MSG_DONTWAIT);
+		fd_set rfds;
+		struct timeval tv;
+		int retval;
 
-		if (bytesRead < 0)
-			cout << "ERRNO: " << errno << endl;
+		/* Watch socket to see when it has data to be read */
+		FD_ZERO(&rfds);
+		FD_SET(sockfd, &rfds);
+
+		/* Wait up to five seconds */
+		tv.tv_sec = 5;
+		tv.tv_usec = 0;
+
+		retval = select(sockfd+1, &rfds, NULL, NULL, &tv);
+
+		if (retval == -1)
+		{	
+			error("select() ERROR! errno: " + errno);
+		}
+		else if (retval == 0)
+		{
+			debug("Select timed out. Nothing to read from socket.");
+			break;
+		}
+
+		bytesRead = read(sockfd, temp, tempSize);
+
+		cout << "Bytes read: " << bytesRead << endl;
 
 		cout << "*** bytesRead: " << temp << "***" << endl;
 
@@ -135,13 +159,7 @@ void process(int clientSockfd)
 		{
 			persistentConnection = false;
 			debug("close connection specified");
-			req.RemoveHeader("Connection");
 		}
-
-		// Check for conditional get
-		
-
-
 
 		// HTTP Request good, send to server
 		string path = req.GetPath();
@@ -199,7 +217,31 @@ void process(int clientSockfd)
 		cout << "servSockfd: " << servSockfd << endl;
 		cout << "bufLength: " << bufLength << endl;
 
-	  	int bytesWritten = send(servSockfd, buffer, bufLength, 0);
+		fd_set wfds;
+		struct timeval tv;
+		int retval;
+
+		/* Watch socket to see when it has data to be read */
+		FD_ZERO(&wfds);
+		FD_SET(servSockfd, &wfds);
+
+		/* Wait up to five seconds */
+		tv.tv_sec = 5;
+		tv.tv_usec = 0;
+
+		retval = select(servSockfd+1, NULL, &wfds, NULL, &tv);
+
+		if (retval == -1)
+		{	
+			error("select() ERROR! errno: " + errno);
+		}
+		else if (retval == 0)
+		{
+			debug("Select timed out. Unable to write to socket.");
+			break;
+		}
+
+	  	int bytesWritten = write(servSockfd, buffer, bufLength);
 
 	  	cout << "bytesWritten: " << bytesWritten << endl;
 
@@ -221,12 +263,34 @@ void process(int clientSockfd)
 
 		//Send back to client
 		debug("Sending response to client");
-		bytesWritten = send(clientSockfd, buffer, dataSize, 0);
+
+		/* Watch socket to see when it has data to be read */
+		FD_ZERO(&wfds);
+		FD_SET(clientSockfd, &wfds);
+
+		/* Wait up to five seconds */
+		tv.tv_sec = 5;
+		tv.tv_usec = 0;
+
+		retval = select(clientSockfd+1, NULL, &wfds, NULL, &tv);
+
+		if (retval == -1)
+		{	
+			error("select() ERROR! errno: " + errno);
+		}
+		else if (retval == 0)
+		{
+			debug("Select timed out. Unable to write to socket.");
+			break;
+		}
+
+		bytesWritten = write(clientSockfd, buffer, dataSize);
 		if(bytesWritten < 0)
 			error("Error writing to clientSockfd");
 
 		free(buffer);
 		debug("End of request");
+		debug("*********************************************");
 		sleep(5);
 	}
 
