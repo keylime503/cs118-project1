@@ -45,12 +45,10 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 
 	//TODO: Check for overflow problems
 
-	int largeNum = 1024;
-
 	dataSize = 0;
-	buffSize = largeNum;
+	buffSize = 1024;
 	int bytesRead = 0;
-	int tempSize = largeNum;
+	int tempSize = 1024;
 	char* temp = new char[tempSize];
 	char* buffer = new char[buffSize];
 	bzero(temp, tempSize);
@@ -58,7 +56,7 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 	
 	while(1)
 	{
-		debug("BytesRead loop");
+		debug("Top of BytesRead loop");
 
 		fd_set rfds;
 		struct timeval tv;
@@ -68,8 +66,8 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 		FD_ZERO(&rfds);
 		FD_SET(sockfd, &rfds);
 
-		/* Wait up to five seconds */
-		tv.tv_sec = 5;
+		/* Wait up to two seconds */
+		tv.tv_sec = 2;
 		tv.tv_usec = 0;
 
 		retval = select(sockfd+1, &rfds, NULL, NULL, &tv);
@@ -103,6 +101,34 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 		//Add to buffer
 		memcpy(buffer + dataSize, temp, bytesRead);
 		dataSize += bytesRead;
+
+		/* Check for content-length header */
+		size_t found = buffer.find("\r\n\r\n");
+		if (found != npos)
+		{
+			/* \r\n\r\n found in buffer */
+			HttpRequest req;
+			try
+			{
+				req.ParseRequest(buffer, dataSize);
+				//req.ParseHeaders(buffer, dataSize);
+			}
+			catch(ParseException e)
+			{
+				cout << "In catch block!!!" << endl;
+				debug(e.what());
+			}
+			
+			/* Get content length */
+			int contentLength = atoi(req.FindHeader("Content-Length")); // IN 8-BYTE OCTETS!!!
+			if (contentLength != "")
+			{
+				cout << "contentLength: " << contentLength << endl;
+
+				int totalLength = npos + sizeof("\r\n\r\n") + contentLength;
+
+				cout << "totalLength: " << totalLength << endl;
+		}
 	}
 	debug("End of readResponse()");
 	free(temp);
@@ -114,10 +140,10 @@ void process(int clientSockfd)
 	/*time_t startTime, endTime;
 	time(&startTime);
 	double timeElapsed = 0;*/
-	bool persistentConnection = true;
+	//bool persistentConnection = true;
 
-	while(persistentConnection) // TODO: infinite for now!!!
-	{
+	//while(persistentConnection) // TODO: infinite for now!!!
+	//{
 		debug("In process loop");
 
 		// Timer
@@ -157,7 +183,7 @@ void process(int clientSockfd)
 		cout << "--- conn value: " << connHeader << endl;
 		if (connHeader == "close")
 		{
-			persistentConnection = false;
+			//persistentConnection = false;
 			debug("close connection specified");
 		}
 
@@ -292,7 +318,7 @@ void process(int clientSockfd)
 		debug("End of request");
 		debug("*********************************************");
 		sleep(5);
-	}
+	//}
 
 	debug("Closing connection");
 }
