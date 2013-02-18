@@ -160,7 +160,7 @@ server2.start()
 # else: 
 #     print "Basic object fetching: [" + bcolors.FAIL + "FAILED" + bcolors.ENDC + "]"
 
-client2 = ClientPersistThread("127.0.0.1:" + pport, "http://127.0.0.1:" + sport1 + "/basic", "./basic", "http://127.0.0.1:" + sport2 + "/basic2", "./basic2")
+client2 = ClientPersistThread("127.0.0.1:" + pport, "http://127.0.0.1:" + sport1 + "/basic", "./basic", "http://127.0.0.1:" + sport1 + "/basic2", "./basic2")
 client2.start()
 client2.join()
 if client2.result:

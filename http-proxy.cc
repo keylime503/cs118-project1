@@ -164,6 +164,8 @@ void process(int clientSockfd)
 			req.RemoveHeader("Connection");
 		}
 
+		// Add close connection to outgoing HTTP Request object
+		req.AddHeader("Connection", "close");
 
 		// HTTP Request good, send to server
 		string path = req.GetPath();
