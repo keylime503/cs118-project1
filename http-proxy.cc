@@ -295,7 +295,7 @@ void process(int clientSockfd)
 
 		free(buffer);
 		debug("End of request");
-		debug("*********************************************")
+		debug("*********************************************");
 		sleep(5);
 	}
 
