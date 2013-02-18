@@ -58,7 +58,7 @@ void error(string msg)
 //and dataSize to the amount of data. Caller must free the buffer.
 char * readResponse(int sockfd, int& buffSize, int& dataSize, int type)
 {
-	//debug("In readResponse()");
+	debug("In readResponse()");
 
 	//TODO: Check for overflow problems
 
@@ -98,7 +98,9 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize, int type)
 		dataSize += bytesRead;
 
 		/* Parse temp buffer for \r\n\r\n */
+		cout << "buffer: " << buffer << endl;
 		position = strstr(buffer, "\r\n\r\n"); // Returns null if not found. null-terminator???
+		cout << "position: " << position << endl;
 	}
 
 	/* Found empty line, ok to parse */
