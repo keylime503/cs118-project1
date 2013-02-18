@@ -36,10 +36,27 @@ void error(string msg)
 	exit(1);
 }
 
+
+// Parses buffer for \r\n\r\n and return position if found, -1 if not
+/*int emptyLine(char * buffer, int buffSize)
+{
+	int pos = 0;
+	int runner = 0;
+
+	for (pos = 0; pos < buffSize; pos++)
+	{
+		if buffer
+	}
+
+
+
+	return -1;
+}*/
+
 //Reads all of the data on a socket, and puts it in a char buffer.
 //Returns pointer to char buffer, sets buffSize to the allocated size
 //and dataSize to the amount of data. Caller must free the buffer.
-char * readResponse(int sockfd, int& buffSize, int& dataSize)
+char * readResponse(int sockfd, int& buffSize, int& dataSize, int type)
 {
 	//debug("In readResponse()");
 
@@ -53,52 +70,18 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 	char* buffer = new char[buffSize];
 	bzero(temp, tempSize);
 	bzero(buffer, buffSize);
-	
-	while(1)
+
+	char * position = NULL;
+	int totalLength = -1;
+
+	/* Read until you find the empty line */
+	while (position == NULL)
 	{
-		//debug("Top of BytesRead loop");
-
-		fd_set rfds;
-		struct timeval tv;
-		int retval;
-
-		/* Watch socket to see when it has data to be read */
-		FD_ZERO(&rfds);
-		FD_SET(sockfd, &rfds);
-
-		/* Wait up to two seconds */
-		tv.tv_sec = 2;
-		tv.tv_usec = 0;
-
-		retval = select(sockfd+1, &rfds, NULL, NULL, &tv);
-
-		//cout << "$$$ retval: " << retval << endl;
-
-		if (retval == -1)
-		{	
-			error("select() ERROR! errno: " + errno);
-		}
-		else if (retval == 0)
-		{
-			debug("Select timed out. Nothing to read from socket.");
-			break;
-		}
-
-		//cout << "tempSize: " << tempSize << endl;
-
-		bytesRead = recv(sockfd, temp, tempSize, 0);
-
+		bytesRead = read(sockfd, temp, tempSize);
 		if (bytesRead < 0)
-			error("Error reading from socket");
-		else if (bytesRead == 0)
-		{
-			debug("ZERO bytes read");
-			sleep(5);
-		}
-
-		//cout << "Bytes read: " << bytesRead << endl;
-
-		cout << temp << endl;
+			error("Error reading bytes from socket");
+		else if(bytesRead == 0)
+			debug ("ZERO bytes read");
 
 		//Check if buffer is big enough
 		if(buffSize < dataSize + bytesRead)
@@ -114,40 +97,92 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 		memcpy(buffer + dataSize, temp, bytesRead);
 		dataSize += bytesRead;
 
-		/* Check for content-length header */
-		HttpHeaders hdr;
-
-		try
-		{
-			hdr.ParseHeaders(buffer, dataSize);
-		}
-		catch(ParseException e)
-		{
-			//cout << "In catch block!!!" << endl;
-			//debug(e.what());
-			continue;
-		}
-		
-		/* Get content length */
-		int headerLength = hdr.GetTotalLength();
-		if (headerLength == 0)
-			error("Header length of 0???");
-
-		string cl = hdr.FindHeader("Content-Length"); // IN 8-BYTE OCTETS!!!
-		if (cl == "")
-			debug("Cannot find contentLength header");
-
-		int contentLength = 8*(atoi(cl.c_str())); 
-		int totalLength = headerLength + contentLength;
-		cout << "contentLength: " << contentLength << endl;
-		cout << "headerLength: " << headerLength << endl;
-		cout << "totalLength: " << totalLength << endl;
-
-		if (dataSize < totalLength) // More to read!!!
-			continue;
-		else
-			break;
+		/* Parse temp buffer for \r\n\r\n */
+		position = strstr(buffer, "\r\n\r\n"); // Returns null if not found. null-terminator???
 	}
+
+	/* Found empty line, ok to parse */
+	totalLength = (position - buffer) + sizeof("\r\n\r\n");
+	String contentLength = "";
+	if (type == 0) // HTTP Request
+	{
+		HttpRequest req;
+		req.ParseRequest(buffer, dataSize);
+		contentLength = req.FindHeader("Content-Length");
+		if (contentLength != "")
+		{
+			 totalLength += atoi(contentLength.c_str());
+		}
+	}
+	else if (type == 1) // HTTP Response
+	{
+		HttpResponse res;
+		res.ParseResponse(buffer, dataSize);
+		contentLength = res.FindHeader("Content-Length");
+		if (contentLength != "")
+		{
+			 totalLength += atoi(contentLength.c_str());
+		}
+	}
+	else // Should never happen
+		error("Invalid readResponse() parameter")
+
+	// At this point, totalLength represents how much data we expect in total
+
+	/* If there is content, we may not have read enough data yet */
+	if (contentLength != "")
+	{
+		while(totalLength > dataSize)
+		{
+			bytesRead = read(sockfd, temp, tempSize);
+			if (bytesRead < 0)
+				error("Error reading bytes from socket");
+			else if(bytesRead == 0)
+				debug ("ZERO bytes read");
+
+			//Check if buffer is big enough
+			if(buffSize < dataSize + bytesRead)
+			{
+				debug("*** resizing buffer ***");
+				char* bigBuffer = new char[buffSize * 2];
+				memcpy(buffer, bigBuffer, dataSize);
+				buffSize *= 2;
+				free(buffer);
+				buffer = bigBuffer;
+			}
+			
+			//Add to buffer
+			memcpy(buffer + dataSize, temp, bytesRead);
+			dataSize += bytesRead;
+		}
+	}
+
+	// fd_set rfds;
+	// struct timeval tv;
+	// int retval;
+
+	// /* Watch socket to see when it has data to be read */
+	// FD_ZERO(&rfds);
+	// FD_SET(sockfd, &rfds);
+
+	// /* Wait up to two seconds */
+	// tv.tv_sec = 2;
+	// tv.tv_usec = 0;
+
+	// retval = select(sockfd+1, &rfds, NULL, NULL, &tv);
+
+	// //cout << "$$$ retval: " << retval << endl;
+
+	// if (retval == -1)
+	// {	
+	// 	error("select() ERROR! errno: " + errno);
+	// }
+	// else if (retval == 0)
+	// {
+	// 	debug("Select timed out. Nothing to read from socket.");
+	// 	break;
+	// }
+
 	debug("End of readResponse()");
 	free(temp);
 	return buffer;
@@ -174,7 +209,7 @@ void process(int clientSockfd)
 		//Read from socket
 		int buffSize = 0; 
 		int dataSize = 0;
-		char * buffer = readResponse(clientSockfd, buffSize, dataSize);
+		char * buffer = readResponse(clientSockfd, buffSize, dataSize, 0);
 
 		//cout << "Buffer w/ request from client: " << buffer << endl;
 
@@ -314,7 +349,7 @@ void process(int clientSockfd)
 		usleep(500000);
 		// Listening to response from server
 		debug("Listening for response from server");
-		buffer = readResponse(servSockfd, buffSize, dataSize);
+		buffer = readResponse(servSockfd, buffSize, dataSize, 1);
 
 		cout << "Buffer w/ response for client: " << buffer << endl;
 
