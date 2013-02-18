@@ -56,7 +56,7 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 	
 	while(1)
 	{
-		debug("Top of BytesRead loop");
+		//debug("Top of BytesRead loop");
 
 		fd_set rfds;
 		struct timeval tv;
@@ -72,7 +72,7 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 
 		retval = select(sockfd+1, &rfds, NULL, NULL, &tv);
 
-		cout << "$$$ retval: " << retval << endl;
+		//cout << "$$$ retval: " << retval << endl;
 
 		if (retval == -1)
 		{	
@@ -84,7 +84,7 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 			break;
 		}
 
-		cout << "tempSize: " << tempSize << endl;
+		//cout << "tempSize: " << tempSize << endl;
 
 		bytesRead = recv(sockfd, temp, tempSize, 0);
 
@@ -96,9 +96,9 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 			sleep(5);
 		}
 
-		cout << "Bytes read: " << bytesRead << endl;
+		//cout << "Bytes read: " << bytesRead << endl;
 
-		cout << "*** bytesRead: " << temp << "***" << endl;
+		cout << temp << endl;
 
 		//Check if buffer is big enough
 		if(buffSize < dataSize + bytesRead)
@@ -123,9 +123,9 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 		}
 		catch(ParseException e)
 		{
-			cout << "In catch block!!!" << endl;
-			debug(e.what());
-			continue;
+			//cout << "In catch block!!!" << endl;
+			//debug(e.what());
+			//continue;
 		}
 		
 		/* Get content length */
@@ -203,6 +203,20 @@ void process(int clientSockfd)
 			persistentConnection = false;
 			debug("close connection specified");
 		}
+
+		//Check cache for item
+		//Open file for item
+		//If item exists in cache
+			//If item is expired
+				//Append to request if-modified-since-expire-time
+				//Send request to server
+				//If response is 300
+					//reset expire time
+				//Else
+					//replace cached item 
+		//Else
+		//Send request to server, store in cache
+		//Send item back to client
 
 		// HTTP Request good, send to server
 		string path = req.GetPath();
