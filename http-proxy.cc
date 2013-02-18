@@ -72,6 +72,8 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 
 		retval = select(sockfd+1, &rfds, NULL, NULL, &tv);
 
+		cout << "$$$ retval: " << retval << endl;
+
 		if (retval == -1)
 		{	
 			error("select() ERROR! errno: " + errno);
@@ -81,6 +83,8 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 			debug("Select timed out. Nothing to read from socket.");
 			break;
 		}
+
+		cout << "tempSize: " << tempSize << endl;
 
 		bytesRead = read(sockfd, temp, tempSize);
 
@@ -123,7 +127,7 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 
 		string cl = hdr.FindHeader("Content-Length"); // IN 8-BYTE OCTETS!!!
 		if (cl == "")
-			error("Cannot find contentLength header");
+			debug("Cannot find contentLength header");
 
 		int contentLength = 8*(atoi(cl.c_str())); 
 		int totalLength = headerLength + contentLength;
@@ -131,7 +135,9 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 		cout << "headerLength: " << headerLength << endl;
 		cout << "totalLength: " << totalLength << endl;
 
-		if (dataSize >= totalLength)
+		if (dataSize < totalLength) // More to read!!!
+			continue;
+		else
 			break;
 	}
 	debug("End of readResponse()");
@@ -144,10 +150,10 @@ void process(int clientSockfd)
 	/*time_t startTime, endTime;
 	time(&startTime);
 	double timeElapsed = 0;*/
-	//bool persistentConnection = true;
+	bool persistentConnection = true;
 
-	//while(persistentConnection) // TODO: infinite for now!!!
-	//{
+	while(persistentConnection) // TODO: infinite for now!!!
+	{
 		debug("In process loop");
 
 		// Timer
@@ -166,9 +172,8 @@ void process(int clientSockfd)
 
 		//debug("After readResponse()");
 
-		// Create HTTP Request, Headers objects
+		// Create HTTP Request
 		HttpRequest req;
-		//HttpHeaders hdrs;
 		try
 		{
 			req.ParseRequest(buffer, dataSize);
@@ -187,7 +192,7 @@ void process(int clientSockfd)
 		cout << "--- conn value: " << connHeader << endl;
 		if (connHeader == "close")
 		{
-			//persistentConnection = false;
+			persistentConnection = false;
 			debug("close connection specified");
 		}
 
@@ -269,8 +274,8 @@ void process(int clientSockfd)
 		FD_ZERO(&wfds);
 		FD_SET(servSockfd, &wfds);
 
-		/* Wait up to five seconds */
-		tv.tv_sec = 5;
+		/* Wait up to two seconds */
+		tv.tv_sec = 2;
 		tv.tv_usec = 0;
 
 		retval = select(servSockfd+1, NULL, &wfds, NULL, &tv);
@@ -282,7 +287,7 @@ void process(int clientSockfd)
 		else if (retval == 0)
 		{
 			debug("Select timed out. Unable to write to socket.");
-			//break;
+			break;
 		}
 
 	  	int bytesWritten = write(servSockfd, buffer, bufLength);
@@ -312,8 +317,8 @@ void process(int clientSockfd)
 		FD_ZERO(&wfds);
 		FD_SET(clientSockfd, &wfds);
 
-		/* Wait up to five seconds */
-		tv.tv_sec = 5;
+		/* Wait up to two seconds */
+		tv.tv_sec = 2;
 		tv.tv_usec = 0;
 
 		retval = select(clientSockfd+1, NULL, &wfds, NULL, &tv);
@@ -325,7 +330,7 @@ void process(int clientSockfd)
 		else if (retval == 0)
 		{
 			debug("Select timed out. Unable to write to socket.");
-			//break;
+			break;
 		}
 
 		bytesWritten = write(clientSockfd, buffer, dataSize);
@@ -336,7 +341,7 @@ void process(int clientSockfd)
 		debug("End of request");
 		debug("*********************************************");
 		sleep(5);
-	//}
+	}
 
 	debug("Closing connection");
 }
