@@ -77,6 +77,8 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize, int type)
 	/* Read until you find the empty line */
 	while (position == NULL)
 	{
+		debug("in first while loop");
+
 		bytesRead = read(sockfd, temp, tempSize);
 		if (bytesRead < 0)
 			error("Error reading bytes from socket");
