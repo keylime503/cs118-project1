@@ -125,7 +125,7 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize, int type)
 		}
 	}
 	else // Should never happen
-		error("Invalid readResponse() parameter")
+		error("Invalid readResponse() parameter");
 
 	// At this point, totalLength represents how much data we expect in total
 
