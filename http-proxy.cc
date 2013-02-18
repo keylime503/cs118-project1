@@ -72,6 +72,8 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 
 		retval = select(sockfd+1, &rfds, NULL, NULL, &tv);
 
+		cout << "$$$ retval: " << retval << endl;
+
 		if (retval == -1)
 		{	
 			error("select() ERROR! errno: " + errno);
