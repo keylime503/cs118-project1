@@ -253,6 +253,8 @@ void process(int clientSockfd)
 			debug("close connection specified");
 		}
 
+		req.AddHeader("Connection", "close");
+
 		//Check cache for item
 		//Open file for item
 		//If item exists in cache
@@ -395,13 +397,12 @@ void process(int clientSockfd)
 			error("Error writing to clientSockfd");
 
 		free(buffer);
-		debug("End of request. Closing socket to server.");
-		close(servSockfd);
+		debug("End of request.");
 		debug("*********************************************");
-		sleep(5);
+		//sleep(5);
 	}
 
-	debug("Closing connection");
+	debug("Closing connection w/ client");
 }
 
 int main (int argc, char *argv[])
