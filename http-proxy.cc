@@ -146,10 +146,10 @@ void process(int clientSockfd)
 	/*time_t startTime, endTime;
 	time(&startTime);
 	double timeElapsed = 0;*/
-	//bool persistentConnection = true;
+	bool persistentConnection = true;
 
-	//while(persistentConnection) // TODO: infinite for now!!!
-	//{
+	while(persistentConnection) // TODO: infinite for now!!!
+	{
 		debug("In process loop");
 
 		// Timer
@@ -168,9 +168,8 @@ void process(int clientSockfd)
 
 		//debug("After readResponse()");
 
-		// Create HTTP Request, Headers objects
+		// Create HTTP Request
 		HttpRequest req;
-		//HttpHeaders hdrs;
 		try
 		{
 			req.ParseRequest(buffer, dataSize);
@@ -189,7 +188,7 @@ void process(int clientSockfd)
 		cout << "--- conn value: " << connHeader << endl;
 		if (connHeader == "close")
 		{
-			//persistentConnection = false;
+			persistentConnection = false;
 			debug("close connection specified");
 		}
 
@@ -257,8 +256,8 @@ void process(int clientSockfd)
 		FD_ZERO(&wfds);
 		FD_SET(servSockfd, &wfds);
 
-		/* Wait up to five seconds */
-		tv.tv_sec = 5;
+		/* Wait up to two seconds */
+		tv.tv_sec = 2;
 		tv.tv_usec = 0;
 
 		retval = select(servSockfd+1, NULL, &wfds, NULL, &tv);
@@ -270,7 +269,7 @@ void process(int clientSockfd)
 		else if (retval == 0)
 		{
 			debug("Select timed out. Unable to write to socket.");
-			//break;
+			break;
 		}
 
 	  	int bytesWritten = write(servSockfd, buffer, bufLength);
@@ -300,8 +299,8 @@ void process(int clientSockfd)
 		FD_ZERO(&wfds);
 		FD_SET(clientSockfd, &wfds);
 
-		/* Wait up to five seconds */
-		tv.tv_sec = 5;
+		/* Wait up to two seconds */
+		tv.tv_sec = 2;
 		tv.tv_usec = 0;
 
 		retval = select(clientSockfd+1, NULL, &wfds, NULL, &tv);
@@ -313,7 +312,7 @@ void process(int clientSockfd)
 		else if (retval == 0)
 		{
 			debug("Select timed out. Unable to write to socket.");
-			//break;
+			break;
 		}
 
 		bytesWritten = write(clientSockfd, buffer, dataSize);
@@ -324,7 +323,7 @@ void process(int clientSockfd)
 		debug("End of request");
 		debug("*********************************************");
 		sleep(5);
-	//}
+	}
 
 	debug("Closing connection");
 }
