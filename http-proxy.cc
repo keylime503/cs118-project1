@@ -56,7 +56,7 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 	
 	while(1)
 	{
-		debug("Top of BytesRead loop");
+		//debug("Top of BytesRead loop");
 
 		fd_set rfds;
 		struct timeval tv;
@@ -72,7 +72,7 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 
 		retval = select(sockfd+1, &rfds, NULL, NULL, &tv);
 
-		cout << "$$$ retval: " << retval << endl;
+		//cout << "$$$ retval: " << retval << endl;
 
 		if (retval == -1)
 		{	
@@ -84,13 +84,13 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 			break;
 		}
 
-		cout << "tempSize: " << tempSize << endl;
+		//cout << "tempSize: " << tempSize << endl;
 
 		bytesRead = read(sockfd, temp, tempSize);
 
-		cout << "Bytes read: " << bytesRead << endl;
+		//cout << "Bytes read: " << bytesRead << endl;
 
-		cout << "*** bytesRead: " << temp << "***" << endl;
+		cout << temp << endl;
 
 		//Check if buffer is big enough
 		if(buffSize < dataSize + bytesRead)
@@ -115,9 +115,9 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 		}
 		catch(ParseException e)
 		{
-			cout << "In catch block!!!" << endl;
-			debug(e.what());
-			continue;
+			//cout << "In catch block!!!" << endl;
+			//debug(e.what());
+			//continue;
 		}
 		
 		/* Get content length */
