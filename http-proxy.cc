@@ -88,6 +88,11 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 
 		bytesRead = read(sockfd, temp, tempSize);
 
+		if (bytesRead < 0)
+			error("Error reading from socket");
+		else if (bytesRead == 0)
+			sleep(5);
+
 		cout << "Bytes read: " << bytesRead << endl;
 
 		cout << "*** bytesRead: " << temp << "***" << endl;
