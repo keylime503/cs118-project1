@@ -103,7 +103,7 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 		dataSize += bytesRead;
 
 		/* Check for content-length header */
-		HTTPHeaders hdr;
+		HttpHeaders hdr;
 
 		try
 		{
@@ -265,7 +265,7 @@ void process(int clientSockfd)
 		else if (retval == 0)
 		{
 			debug("Select timed out. Unable to write to socket.");
-			break;
+			//break;
 		}
 
 	  	int bytesWritten = write(servSockfd, buffer, bufLength);
@@ -308,7 +308,7 @@ void process(int clientSockfd)
 		else if (retval == 0)
 		{
 			debug("Select timed out. Unable to write to socket.");
-			break;
+			//break;
 		}
 
 		bytesWritten = write(clientSockfd, buffer, dataSize);
