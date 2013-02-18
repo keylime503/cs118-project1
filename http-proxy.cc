@@ -118,12 +118,14 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 		
 		/* Get content length */
 		int headerLength = hdr.GetTotalLength();
-		string cl = hdr.FindHeader("Content-Length");
-		int contentLength = 8*(atoi(cl.c_str())); // IN 8-BYTE OCTETS!!!
+		if (headerLength == 0)
+			error("Header length of 0???");
 
-		if (headerLength == "" || contentLength == "")
-			error("Cannot find length header(s)");
+		string cl = hdr.FindHeader("Content-Length"); // IN 8-BYTE OCTETS!!!
+		if (cl == "")
+			error("Cannot find contentLength header");
 
+		int contentLength = 8*(atoi(cl.c_str())); 
 		int totalLength = headerLength + contentLength;
 		cout << "contentLength: " << contentLength << endl;
 		cout << "headerLength: " << headerLength << endl;
