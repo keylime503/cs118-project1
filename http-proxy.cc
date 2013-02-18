@@ -123,7 +123,7 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 
 		string cl = hdr.FindHeader("Content-Length"); // IN 8-BYTE OCTETS!!!
 		if (cl == "")
-			error("Cannot find contentLength header");
+			debug("Cannot find contentLength header");
 
 		int contentLength = 8*(atoi(cl.c_str())); 
 		int totalLength = headerLength + contentLength;
@@ -131,7 +131,9 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize)
 		cout << "headerLength: " << headerLength << endl;
 		cout << "totalLength: " << totalLength << endl;
 
-		if (dataSize >= totalLength)
+		if (dataSize < totalLength) // More to read!!!
+			continue;
+		else
 			break;
 	}
 	debug("End of readResponse()");
