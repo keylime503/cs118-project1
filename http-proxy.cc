@@ -98,9 +98,10 @@ char * readResponse(int sockfd, int& buffSize, int& dataSize, int type)
 		dataSize += bytesRead;
 
 		/* Parse temp buffer for \r\n\r\n */
-		cout << "buffer: " << buffer << endl;
+		cout << "buffer: " << buffer << "***endofbuffer***" << endl;
 		position = strstr(buffer, "\r\n\r\n"); // Returns null if not found. null-terminator???
-		cout << "position: " << position << endl;
+		if (position != NULL)
+			cout << "position: " << position << endl;
 	}
 
 	/* Found empty line, ok to parse */
